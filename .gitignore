@@ -43,8 +43,3 @@ htmlcov/
 .DS_Store
 Thumbs.db
 
-# Migrations (opcional, si no quieres subirlas al repo inicial)
-# **/migrations/
-# pero deja __init__.py
-**/migrations/*.py
-!**/migrations/__init__.py

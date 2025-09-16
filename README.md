@@ -1,8 +1,10 @@
 # Entreno-Curos-Cortos
-SenaSoft
+## Librerias necesrias
 
-python -m pip install mysqlclient
-python -m pip install pymysql
+* python -m pip install mysqlclient
+
+* python -m pip install pymysql
+
 # Entreno-Cursos-Cortos
 ### SenaSoft
 ![VS Code](https://img.shields.io/badge/VS%20Code-0078D4?style=for-the-badge&logo=visual-studio-code&logoColor=white)

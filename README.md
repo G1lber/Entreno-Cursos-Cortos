@@ -1,2 +1,2 @@
-# Entreno-Curos-Cortos
+# Entreno-Cursos-Cortos
 ### SenaSoft

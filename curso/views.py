@@ -95,10 +95,6 @@ def get_municipios(request, departamento_id):
     municipios = Municipio.objects.filter(departamento_id=departamento_id).values("id", "nombre")
     return JsonResponse(list(municipios), safe=False)
 
-@login_required
-def index(request):
-    return render(request, 'layout/index.html')
-
 def inicioSesion(request):
     if request.method == 'POST':
         form = InicioSesionForm(request.POST)

@@ -24,6 +24,18 @@ body {
   padding: 1rem;
 }
 
+/* Botón volver */
+.back-link {
+  display: inline-block;
+  margin-bottom: 10px;
+  color: #555;
+  font-size: 14px;
+  text-decoration: none;
+}
+.back-link:hover {
+  color: #000;
+}
+
 /* Grid de estadísticas */
 .stats-grid {
   display: grid;

@@ -79,7 +79,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.mysql',   # Driver MySQL
         'NAME': 'cursos_cortos',                      # Nombre de tu base de datos
         'USER': 'root',                        # Usuario de MySQL
-        'PASSWORD': '',             # Contraseña
+        'PASSWORD': 'root',             # Contraseña
         'HOST': '127.0.0.1',                   # Servidor (localhost)
         'PORT': '3306',                        # Puerto por defecto MySQL
         'OPTIONS': {
@@ -138,12 +138,12 @@ MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # Configuración para Hotmail/Outlook
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+#EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
-# EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.office365.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
-# EMAIL_HOST_USER = 'tucorreo@hotmail.com'       # tu correo real
-# EMAIL_HOST_PASSWORD = 'tu_contraseña_real'     # contraseña real de la cuenta
-# DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+EMAIL_HOST_USER = 'ADSO602@hotmail.com'       # tu correo real
+EMAIL_HOST_PASSWORD = 'uepmwpwhhdcdysak'     # contraseña real de la cuenta
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER

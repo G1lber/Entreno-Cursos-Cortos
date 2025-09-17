@@ -17,12 +17,12 @@
 
             <div class="form-row">
               <div class="form-group">
-                <label for="{{ form.codigoprograma.id_for_label }}">Código del programa</label>
-                {{ form.codigoprograma }}
-              </div>
-              <div class="form-group">
                 <label for="{{ form.nombreprograma.id_for_label }}">Nombre del programa</label>
                 {{ form.nombreprograma }}
+              </div>
+              <div class="form-group">
+                <label for="{{ form.codigoprograma.id_for_label }}">Código del programa</label>
+                {{ form.codigoprograma }}
               </div>
             </div>
 
@@ -31,22 +31,14 @@
                 <label for="{{ form.versionprograma.id_for_label }}">Versión</label>
                 {{ form.versionprograma }}
               </div>
+
               <div class="form-group">
                 <label for="{{ form.duracionprograma.id_for_label }}">Duración (Horas)</label>
                 {{ form.duracionprograma }}
               </div>
             </div>
 
-            <div class="form-row">
-              <div class="form-group">
-                <label for="{{ form.fechainicio.id_for_label }}">Fecha inicio</label>
-                {{ form.fechainicio }}
-              </div>
-              <div class="form-group">
-                <label for="{{ form.fechafin.id_for_label }}">Fecha fin</label>
-                {{ form.fechafin }}
-              </div>
-            </div>
+            
           </div>
 
           <!-- UBICACIÓN -->
@@ -58,6 +50,7 @@
                 <label for="{{ form.departamento.id_for_label }}">Departamento</label>
                 {{ form.departamento }}
               </div>
+
               <div class="form-group">
                 <label for="{{ form.municipio.id_for_label }}">Municipio</label>
                 {{ form.municipio }}
@@ -95,11 +88,6 @@
                 {{ form.correo }}
               </div>
             </div>
-
-            <div class="form-group">
-              <label for="{{ form.empresa.id_for_label }}">Empresa solicitante</label>
-              {{ form.empresa }}
-            </div>
           </div>
 
           <!-- DETALLES DEL CURSO -->
@@ -110,7 +98,20 @@
               <label for="{{ form.programa_especial.id_for_label }}">Programa especial</label>
               {{ form.programa_especial }}
             </div>
-
+            <div class="form-group">
+              <label for="{{ form.empresa.id_for_label }}">Empresa solicitante</label>
+              {{ form.empresa }}
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label for="{{ form.fechainicio.id_for_label }}">Fecha inicio</label>
+                {{ form.fechainicio }}
+              </div>
+              <div class="form-group">
+                <label for="{{ form.fechafin.id_for_label }}">Fecha fin</label>
+                {{ form.fechafin }}
+              </div>
+            </div>
             <div class="form-group">
               <label>Días</label>
               <div class="checkbox-group">
@@ -148,6 +149,7 @@
           </div>
         </form>
 
-
+  <script src="{% static 'js/programa.js' %}"></script>
+  <script src="{% static 'js/departamento_municipio.js' %}"></script>
   </body> 
 </html>

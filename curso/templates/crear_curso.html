@@ -1,0 +1,107 @@
+{% extends "index.html" %}
+
+{% block title %}Crear Curso{% endblock %}
+
+
+<form method="post" action="{% url 'create_course' %}">
+  {% csrf_token %}
+
+  <!-- Instructor -->
+  <div class="form-group">
+    <label>Nombre del Instructor</label>
+    <input type="text" value="{{ user.email }}" disabled>
+    <small>Se toma automáticamente del usuario autenticado</small>
+  </div>
+
+  <!-- Programa -->
+  <div class="form-group">
+    <label for="program">Programa *</label>
+    <select id="program" name="program" required>
+      <option value="">Selecciona un programa</option>
+      <option>Tecnología en Desarrollo de Software</option>
+      <option>Tecnología en Redes y Seguridad</option>
+      <option>Tecnología en Análisis de Datos</option>
+      <option>Técnico en Sistemas</option>
+      <option>Técnico en Programación</option>
+      <option>Curso de Especialización</option>
+    </select>
+  </div>
+
+  <!-- Duración y Fecha -->
+  <div class="form-group">
+    <label for="duration">Duración *</label>
+    <input type="text" id="duration" name="duration" placeholder="ej: 6 meses, 120 horas" required>
+  </div>
+
+  <div class="form-group">
+    <label for="startDate">Fecha de Inicio *</label>
+    <input type="date" id="startDate" name="startDate" required>
+  </div>
+
+  <!-- Modalidad y Municipio -->
+  <div class="form-group">
+    <label for="modality">Modalidad *</label>
+    <select id="modality" name="modality" required>
+      <option value="">Selecciona modalidad</option>
+      <option>Presencial</option>
+      <option>Virtual</option>
+      <option>Mixta</option>
+    </select>
+  </div>
+
+  <div class="form-group">
+    <label for="municipality">Municipio *</label>
+    <select id="municipality" name="municipality" required>
+      <option>Bogotá</option>
+      <option>Medellín</option>
+      <option>Cali</option>
+      <option>Barranquilla</option>
+      <option>Cartagena</option>
+      <option>Bucaramanga</option>
+      <option>Pereira</option>
+      <option>Manizales</option>
+      <option>Ibagué</option>
+      <option>Villavicencio</option>
+    </select>
+  </div>
+
+  <!-- Horarios -->
+  <div class="form-group">
+    <label>Días de Dictado *</label>
+    <div class="checkbox-group">
+      <label><input type="checkbox" name="days" value="monday"> Lunes</label>
+      <label><input type="checkbox" name="days" value="tuesday"> Martes</label>
+      <label><input type="checkbox" name="days" value="wednesday"> Miércoles</label>
+      <label><input type="checkbox" name="days" value="thursday"> Jueves</label>
+      <label><input type="checkbox" name="days" value="friday"> Viernes</label>
+      <label><input type="checkbox" name="days" value="saturday"> Sábado</label>
+      <label><input type="checkbox" name="days" value="sunday"> Domingo</label>
+    </div>
+  </div>
+
+  <div class="form-group">
+    <label for="schedule">Horario *</label>
+    <input type="text" id="schedule" name="schedule" placeholder="ej: 8:00 AM - 12:00 PM" required>
+  </div>
+
+  <!-- Descripción -->
+  <div class="form-group">
+    <label for="description">Descripción</label>
+    <textarea id="description" name="description" placeholder="Describe el curso..."></textarea>
+  </div>
+
+  <!-- Alertas Django messages -->
+  {% if messages %}
+    {% for message in messages %}
+      <div class="alert {% if message.tags == 'success' %}alert-success{% else %}alert-error{% endif %}">
+        {{ message }}
+      </div>
+    {% endfor %}
+  {% endif %}
+
+  <!-- Botones -->
+  <div class="form-group" style="display:flex; gap:1rem;">
+    <a href="{% url 'dashboard' %}" class="button-outline" style="flex:1;">Cancelar</a>
+    <button type="submit" class="button button-approve" style="flex:1;">Crear Curso</button>
+  </div>
+</form>

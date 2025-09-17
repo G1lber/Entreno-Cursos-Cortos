@@ -78,7 +78,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.mysql',   # Driver MySQL
         'NAME': 'cursos_cortos',                      # Nombre de tu base de datos
         'USER': 'root',                        # Usuario de MySQL
-        'PASSWORD': 'root',             # Contraseña
+        'PASSWORD': '',             # Contraseña
         'HOST': '127.0.0.1',                   # Servidor (localhost)
         'PORT': '3306',                        # Puerto por defecto MySQL
         'OPTIONS': {
@@ -91,6 +91,7 @@ DATABASES = {
 
 # Password validation
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
+AUTH_USER_MODEL = "curso.Usuario"
 
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -124,6 +125,10 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
 STATIC_URL = 'static/'
+import os
+
+MEDIA_URL = "/media/"
+MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field

@@ -45,7 +45,6 @@ def generar_curso(request):
 
     return render(request, "formularios/formulario-formato.html", {"form": form})
 
-
 # Create your views here.
 @login_required
 def index(request):
@@ -69,18 +68,15 @@ def inicioSesion(request):
         form = InicioSesionForm()
     return render(request, 'layout/inicioSesion.html', {'form': form})
 
-
 def log_out(request):
     logout(request)  # elimina la sesión del usuario
     messages.success(request, "Has cerrado sesión correctamente.")
     return redirect('inicioSesion')  
 
-
 @login_required
 def usuario(request):
     form = UsuarioCreateForm()
     return render(request, 'layout/usuario_form.html', {'form': form })
-
 
 @login_required
 def createUsuario(request):
@@ -93,7 +89,6 @@ def createUsuario(request):
     else:
         form = UsuarioCreateForm()
     return render(request, 'layout/usuario_form.html', {"form": form})
-
 
 @login_required
 def viewUsuarios(request):

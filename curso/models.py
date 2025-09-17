@@ -48,32 +48,33 @@ class TipoDocumento(models.Model):
         return self.nombre or ""
 
 
-class Usuario(models.Model):
-    nombre = models.CharField(max_length=50, null=True, blank=True)
-    apellido = models.CharField(max_length=50, null=True, blank=True)
+from django.contrib.auth.models import AbstractUser
+from django.db import models
+from .managers import UsuarioManager
+class Usuario(AbstractUser):
+    username = None  # Eliminamos username, usamos email
+    email = models.EmailField("correo electrónico", unique=True)
+
     tipo_documento = models.ForeignKey(
-        TipoDocumento,
+        "TipoDocumento",
         on_delete=models.CASCADE,
-        null=True,
-        blank=True,
         related_name="usuarios"
     )
-    documento = models.CharField(max_length=50, null=True, blank=True)
+    documento = models.CharField(max_length=50, unique=True)  # obligatorio y único
     rol = models.ForeignKey(
-        Rol,
+        "Rol",
         on_delete=models.CASCADE,
-        null=True,
-        blank=True,
         related_name="usuarios"
     )
-    correo = models.EmailField(max_length=50, null=True, blank=True)
-    password = models.CharField(max_length=50, null=True, blank=True)
-    firma = models.CharField(max_length=50, null=True, blank=True)
+    firma = models.FileField(upload_to="firmas/", null=True, blank=True)
+
+    USERNAME_FIELD = "email"
+    REQUIRED_FIELDS = []  # para createsuperuser
+
+    objects = UsuarioManager()
 
     def __str__(self):
-        return f"{self.nombre} {self.apellido}".strip()
-
-
+        return f"{self.email} - {self.documento}"
 class Curso(models.Model):
     programa = models.ForeignKey(
         Programa,

@@ -1,0 +1,30 @@
+{% if messages %}
+    <ul class="messages">
+        {% for message in messages %}
+            <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+        {% endfor %}
+    </ul>
+{% endif %}
+
+{% if usuarios %}
+    <h2>Lista de Usuarios</h2>
+    <ul>
+        {% for usuario in usuarios %}
+            <li>{{ usuario.first_name }} {{ usuario.last_name }} - {{ usuario.email }} // EDITAR <a href="{% url 'editUsuario' usuario.id %}">Editar</a></li>
+            {% if usuario.is_active %}
+                <span style="color: green;">Activo</span>
+                <a href="{% url 'toggleUsuario' usuario.id %}">Desactivar</a>
+            {% else %}
+                <span style="color: red;">Inactivo</span>
+                <a href="{% url 'toggleUsuario' usuario.id %}">Activar</a>
+            {% endif %}
+        {% endfor %}
+    </ul>
+{% else %}
+    <p>No hay usuarios disponibles.</p>
+{% endif %}
+
+<a href="{% url 'createUsuario' %}">Crear Usuario</a>
+
+
+<a href="{% url 'logout' %}">Cerrar sesión</a>

@@ -43,4 +43,9 @@ urlpatterns = [
     path('usuario/edit/<int:id>/', views.editUsuario, name='editUsuario'),
     path("usuarios/toggle/<int:id>/", views.toggle_usuario, name="toggleUsuario"),
     path('generar_curso/', views.generar_curso, name='generar_curso'),
+
+    path("dashboard/", views.dashboard, name="dashboard"),
+    path("buscar/", views.buscar_curso, name="buscar_curso"),
+    path("coordinador/", views.coordinador, name="coordinador"),
+    path("reportes/", views.reportes, name="reportes"),
 ]

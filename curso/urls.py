@@ -16,7 +16,7 @@ urlpatterns = [
          name='password_reset'),
 
     # mensaje de éxito
-    path('password_reset_done/', 
+    path('password_reset_done/' , 
          auth_views.PasswordResetDoneView.as_view(
              template_name='layout/password_reset_done.html'
          ), 

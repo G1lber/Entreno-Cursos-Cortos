@@ -1,39 +1,70 @@
+{% extends "base_nav.html" %}
 
-{% block title %}Buscar Cursos{% endblock %}
+{%load static%}
 
-<div>
+{%block content%}
+<link rel="stylesheet" href="{% static 'css/buscar.css' %}">
+<div class="container">
+  <!-- Botón volver -->
+  <a href="{% url 'dashboard' %}" class="back-link">← Volver al Dashboard</a>
+
+  <!-- Encabezado -->
+  <h1>Buscar Cursos</h1>
+  <p class="subtitle">Explora todos los cursos disponibles en el sistema</p>
+
   <!-- Barra de búsqueda -->
-  <form method="get">
+  <form method="get" class="search-bar">
     <input type="text" name="q" placeholder="Buscar por programa, municipio, instructor o modalidad...">
-    <button type="submit" class="button-outline">Buscar</button>
+    <button type="submit">Buscar</button>
   </form>
 
-  <h2>Cursos Encontrados ({{ courses|length }})</h2>
+  <!-- Lista de cursos -->
+  <h2 class="results-title">Cursos Encontrados ({{ courses|length }})</h2>
 
   {% if not courses %}
-    <div class="alert alert-error">No se encontraron cursos</div>
+    <div class="alert error">No se encontraron cursos</div>
   {% else %}
-    {% for course in courses %}
-      <div class="course-item">
-        <h3>{{ course.program }}</h3>
-        <p><strong>Instructor:</strong> {{ course.instructorName }}</p>
-        <p><strong>Duración:</strong> {{ course.duration }}</p>
-        <p><strong>Inicio:</strong> {{ course.startDate|date:"d/m/Y" }}</p>
-        <p><strong>Municipio:</strong> {{ course.municipality }}</p>
-        <p><strong>Modalidad:</strong> {{ course.modality }}</p>
-        <p><strong>Horario:</strong> {{ course.days|join:", " }} - {{ course.schedule }}</p>
-        {% if course.description %}<p>{{ course.description }}</p>{% endif %}
-
-        {% if course.status == "approved" %}
-          <div class="alert alert-success">
-            Curso aprobado. <a href="{{ course.registrationLink }}" target="_blank">Abrir Link</a>
+    <div class="courses-list">
+      {% for course in courses %}
+        <div class="course-card">
+          <div class="course-header">
+            <div>
+              <h3>{{ course.program }}</h3>
+              <p class="instructor">Instructor: {{ course.instructorName }}</p>
+              {% if course.description %}<p class="description">{{ course.description }}</p>{% endif %}
+            </div>
+            <div class="tags">
+              {% if course.status == "pending" %}
+                <span class="tag pending">Pendiente</span>
+              {% elif course.status == "approved" %}
+                <span class="tag active">Activo</span>
+              {% else %}
+                <span class="tag rejected">Rechazado</span>
+              {% endif %}
+              <span class="tag neutral">0/25 inscritos</span>
+            </div>
           </div>
-        {% elif course.status == "pending" %}
-          <div class="alert alert-error">Pendiente de aprobación</div>
-        {% else %}
-          <div class="alert alert-error">Rechazado</div>
-        {% endif %}
-      </div>
-    {% endfor %}
+
+          <div class="course-details">
+            <p>📅 Inicio: {{ course.startDate|date:"d/m/Y" }}</p>
+            <p>⏳ Duración: {{ course.duration }}</p>
+            <p>📍 {{ course.municipality }}</p>
+            <p>🏫 {{ course.modality }}</p>
+            <p>🕑 Horario: {{ course.days|join:", " }} - {{ course.schedule }}</p>
+          </div>
+
+          <div class="course-footer">
+            {% if course.status == "pending" %}
+              La solicitud está pendiente de aprobación
+            {% elif course.status == "approved" %}
+              Curso aprobado. <a href="{{ course.registrationLink }}" target="_blank">Abrir Link</a>
+            {% else %}
+              La solicitud fue rechazada
+            {% endif %}
+          </div>
+        </div>
+      {% endfor %}
+    </div>
   {% endif %}
 </div>
+{%endblock%}

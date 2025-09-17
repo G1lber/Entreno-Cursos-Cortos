@@ -28,13 +28,24 @@ def reportes(request):
     return render(request, 'reportes.html')
 
 def generar_curso(request):
+    usuario = request.user  # Usuario autenticado
+
     if request.method == "POST":
-        form = CursoForm(request.POST)
+        form = CursoForm(request.POST, usuario=usuario)  # 👈 pasamos usuario
         if form.is_valid():
             try:
                 # ✅ Obtener datos del formulario
                 contexto = form.cleaned_data
-                print("✅ Datos del formulario:", contexto)
+
+                # ✅ Agregar datos del usuario al contexto
+                contexto.update({
+                    "nombre": f"{usuario.first_name} {usuario.last_name}".strip(),
+                    "tipodoc": usuario.tipo_documento.nombre,
+                    "numerodoc": usuario.documento,
+                    "correo": usuario.email,
+                })
+
+                print("✅ Datos del formulario + usuario:", contexto)
 
                 # ✅ Construir ruta absoluta de la plantilla
                 ruta = os.path.join(
@@ -67,14 +78,13 @@ def generar_curso(request):
                 return response
 
             except Exception as e:
-                # ⚠️ Captura cualquier error inesperado
                 return HttpResponse(f"Error generando el documento: {e}", status=500)
 
         else:
             print("❌ Formulario inválido:", form.errors)
 
     else:
-        form = CursoForm()
+        form = CursoForm(usuario=usuario)  # 👈 inicializamos con datos del usuario
 
     # Si es GET o si el form es inválido, renderiza el form
     return render(request, "formularios/formulario-formato.html", {"form": form})

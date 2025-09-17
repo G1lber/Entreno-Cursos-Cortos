@@ -1,10 +1,10 @@
 from django.shortcuts import redirect, get_object_or_404
-from .models import TipoDocumento, Rol, Usuario
+from .models import TipoDocumento, Rol, Usuario,Programa
 from .forms import UsuarioEditForm, UsuarioCreateForm, InicioSesionForm
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from .forms import CursoForm
 import os
 import io
@@ -12,6 +12,7 @@ from django.conf import settings
 from django.shortcuts import render
 from docxtpl import DocxTemplate
 
+# generar curso 
 def generar_curso(request):
     if request.method == "POST":
         form = CursoForm(request.POST)
@@ -44,6 +45,18 @@ def generar_curso(request):
         form = CursoForm()
 
     return render(request, "formularios/formulario-formato.html", {"form": form})
+
+def get_programa(request, programa_id):
+    try:
+        programa = Programa.objects.get(id=programa_id)
+        data = {
+            "codigo": programa.codigo,
+            "version": programa.version,
+            "duracion": programa.duracion,
+        }
+        return JsonResponse(data)
+    except Programa.DoesNotExist:
+        return JsonResponse({"error": "Programa no encontrado"}, status=404)
 
 # Create your views here.
 @login_required

@@ -17,12 +17,12 @@
 
             <div class="form-row">
               <div class="form-group">
-                <label for="{{ form.codigoprograma.id_for_label }}">Código del programa</label>
-                {{ form.codigoprograma }}
-              </div>
-              <div class="form-group">
                 <label for="{{ form.nombreprograma.id_for_label }}">Nombre del programa</label>
                 {{ form.nombreprograma }}
+              </div>
+              <div class="form-group">
+                <label for="{{ form.codigoprograma.id_for_label }}">Código del programa</label>
+                {{ form.codigoprograma }}
               </div>
             </div>
 
@@ -31,6 +31,7 @@
                 <label for="{{ form.versionprograma.id_for_label }}">Versión</label>
                 {{ form.versionprograma }}
               </div>
+
               <div class="form-group">
                 <label for="{{ form.duracionprograma.id_for_label }}">Duración (Horas)</label>
                 {{ form.duracionprograma }}
@@ -148,6 +149,6 @@
           </div>
         </form>
 
-
+  <script src="{% static 'js/programa.js' %}"></script>
   </body> 
 </html>

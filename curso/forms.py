@@ -1,5 +1,5 @@
 from django import forms
-from .models import Usuario
+from .models import Usuario, Programa
 
 class InicioSesionForm(forms.Form):
     email = forms.EmailField(label="Correo electrónico")
@@ -82,10 +82,14 @@ class UsuarioEditForm(forms.ModelForm):
     
 
 class CursoForm(forms.Form):
-    codigoprograma = forms.CharField(label="Código del programa", max_length=50)
-    nombreprograma = forms.CharField(label="Nombre del programa", max_length=200)
-    versionprograma = forms.CharField(label="Versión del programa", max_length=20)
-    duracionprograma = forms.CharField(label="Duración (Horas)", max_length=50)
+    nombreprograma = forms.ModelChoiceField(
+        queryset=Programa.objects.all(),
+        label="Nombre del programa",
+        widget=forms.Select(attrs={"class": "form-control"})
+    )
+    codigoprograma = forms.CharField(label="Código del programa", max_length=50, widget=forms.TextInput(attrs={"readonly": "readonly"}))
+    versionprograma = forms.CharField(label="Versión del programa", max_length=20, widget=forms.TextInput(attrs={"readonly": "readonly"}))
+    duracionprograma = forms.CharField(label="Duración (Horas)", max_length=50, widget=forms.TextInput(attrs={"readonly": "readonly"}))
     fechainicio = forms.DateField(label="Fecha de inicio", widget=forms.DateInput(attrs={'type': 'date'}))
     fechafin = forms.DateField(label="Fecha de finalización", widget=forms.DateInput(attrs={'type': 'date'}))
     departamento = forms.CharField(label="Departamento", max_length=100)

@@ -1,10 +1,9 @@
-{% extends "index.html" %}
 
 {% block title %}Buscar Cursos{% endblock %}
 
 <div>
   <!-- Barra de búsqueda -->
-  <form method="get" action="{% url 'search_courses' %}">
+  <form method="get">
     <input type="text" name="q" placeholder="Buscar por programa, municipio, instructor o modalidad...">
     <button type="submit" class="button-outline">Buscar</button>
   </form>

@@ -12,6 +12,21 @@ from django.conf import settings
 from django.shortcuts import render
 from docxtpl import DocxTemplate
 
+def dashboard(request):
+    return render(request, 'dashboard.html')
+
+#Buscar Cursos
+def buscar_curso(request):
+    return render(request, 'buscar_curso.html')
+
+#Coordinador
+def coordinador(request):
+    return render(request, 'coordinador_dashboard.html')
+
+#Reportes
+def reportes(request):
+    return render(request, 'reportes.html')
+
 def generar_curso(request):
     if request.method == "POST":
         form = CursoForm(request.POST)
@@ -45,7 +60,6 @@ def generar_curso(request):
 
     return render(request, "formularios/formulario-formato.html", {"form": form})
 
-# Create your views here.
 @login_required
 def index(request):
     return render(request, 'layout/index.html')

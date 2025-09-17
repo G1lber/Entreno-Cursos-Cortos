@@ -5,6 +5,8 @@
 
 * python -m pip install pymysql
 
+* pip install docxtpl
+
 # Entreno-Cursos-Cortos
 ### SenaSoft
 ![VS Code](https://img.shields.io/badge/VS%20Code-0078D4?style=for-the-badge&logo=visual-studio-code&logoColor=white)

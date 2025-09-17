@@ -3,9 +3,9 @@ from . import views
 from django.contrib.auth import views as auth_views
 from django.urls import path, reverse_lazy
 urlpatterns = [
-    path('', views.index, name='index'),
+    
 
-    path('inicioSesion/', views.inicioSesion, name='inicioSesion'),
+    path('', views.inicioSesion, name='inicioSesion'),
     # formulario para ingresar correo
     path('password_reset/', 
          auth_views.PasswordResetView.as_view(
@@ -42,4 +42,5 @@ urlpatterns = [
     path('usuario/view/', views.viewUsuarios, name='viewUsuarios'),
     path('usuario/edit/<int:id>/', views.editUsuario, name='editUsuario'),
     path("usuarios/toggle/<int:id>/", views.toggle_usuario, name="toggleUsuario"),
+    path('generar_curso/', views.generar_curso, name='generar_curso'),
 ]

@@ -106,9 +106,10 @@
                 {{ form.fechainicio }}
               </div>
               <div class="form-group">
-                <label for="{{ form.fechafin.id_for_label }}">Fecha fin</label>
-                {{ form.fechafin }}
+                <label for="{{ form.fecha1.id_for_label }}">Fechas mes 1</label>
+                {{ form.fecha1 }}
               </div>
+              
             </div>
             <div class="form-group">
               <label>Días</label>
@@ -117,16 +118,10 @@
               </div>
             </div>
 
-            <div class="form-row">
               <div class="form-group">
                 <label for="{{ form.horario.id_for_label }}">Horario del curso</label>
                 {{ form.horario }}
               </div>
-              <div class="form-group">
-                <label for="{{ form.fecha1.id_for_label }}">Fechas mes 1</label>
-                {{ form.fecha1 }}
-              </div>
-            </div>
 
             <div class="form-row">
               <div class="form-group">
@@ -134,10 +129,14 @@
                 {{ form.fecha2 }}
               </div>
               <div class="form-group">
+                <label for="{{ form.fechafin.id_for_label }}">Fecha fin</label>
+                {{ form.fechafin }}
+              </div>
+            </div>
+            <div class="form-group">
                 <label for="{{ form.firma.id_for_label }}">Firma instructor</label>
                 {{ form.firma }}
               </div>
-            </div>
           </div>
 
           <!-- BOTONES -->

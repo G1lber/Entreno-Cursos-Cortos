@@ -1,5 +1,5 @@
 from django.shortcuts import redirect, get_object_or_404
-from .models import TipoDocumento, Rol, Usuario,Programa
+from .models import TipoDocumento, Rol, Usuario,Programa, Departamento, Municipio
 from .forms import UsuarioEditForm, UsuarioCreateForm, InicioSesionForm
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
@@ -13,39 +13,66 @@ from django.shortcuts import render
 from docxtpl import DocxTemplate
 
 # generar curso 
+import os
+import io
+from django.http import HttpResponse
+from django.shortcuts import render
+from django.conf import settings
+from .forms import CursoForm
+from docxtpl import DocxTemplate
+
 def generar_curso(request):
     if request.method == "POST":
         form = CursoForm(request.POST)
         if form.is_valid():
-            # Obtener datos
-            contexto = form.cleaned_data
+            try:
+                # ✅ Obtener datos del formulario
+                contexto = form.cleaned_data
+                print("✅ Datos del formulario:", contexto)
 
-            # Construir ruta absoluta de la plantilla
-            ruta = os.path.join(settings.BASE_DIR, "curso", "templates", "docs", "plantilla-curso.docx")
-            if not os.path.exists(ruta):
-                raise FileNotFoundError(f"No se encontró la plantilla en: {ruta}")
+                # ✅ Construir ruta absoluta de la plantilla
+                ruta = os.path.join(
+                    settings.BASE_DIR,
+                    "curso",
+                    "templates",
+                    "docs",
+                    "plantilla-curso.docx"
+                )
+                if not os.path.exists(ruta):
+                    raise FileNotFoundError(f"No se encontró la plantilla en: {ruta}")
 
-            # Cargar plantilla
-            doc = DocxTemplate(ruta)
-            doc.render(contexto)
+                print(f"📄 Usando plantilla: {ruta}")
 
-            # Guardar en memoria
-            buffer = io.BytesIO()
-            doc.save(buffer)
-            buffer.seek(0)
-            
-            # Respuesta HTTP con archivo generado
-            response = HttpResponse(
-                buffer,
-                content_type="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-            )
-            response["Content-Disposition"] = 'attachment; filename=\"curso_generado.docx\"'
-            return response
+                # ✅ Cargar y renderizar documento
+                doc = DocxTemplate(ruta)
+                doc.render(contexto)
+
+                # ✅ Guardar en memoria
+                buffer = io.BytesIO()
+                doc.save(buffer)
+                buffer.seek(0)
+
+                # ✅ Respuesta HTTP con archivo generado
+                response = HttpResponse(
+                    buffer,
+                    content_type="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+                )
+                response["Content-Disposition"] = 'attachment; filename="curso_generado.docx"'
+                return response
+
+            except Exception as e:
+                # ⚠️ Captura cualquier error inesperado
+                return HttpResponse(f"Error generando el documento: {e}", status=500)
+
+        else:
+            print("❌ Formulario inválido:", form.errors)
+
     else:
         form = CursoForm()
 
+    # Si es GET o si el form es inválido, renderiza el form
     return render(request, "formularios/formulario-formato.html", {"form": form})
-
+# Obtener datos del programa
 def get_programa(request, programa_id):
     try:
         programa = Programa.objects.get(id=programa_id)
@@ -57,6 +84,10 @@ def get_programa(request, programa_id):
         return JsonResponse(data)
     except Programa.DoesNotExist:
         return JsonResponse({"error": "Programa no encontrado"}, status=404)
+# Obtener datos de departamento y municipio
+def get_municipios(request, departamento_id):
+    municipios = Municipio.objects.filter(departamento_id=departamento_id).values("id", "nombre")
+    return JsonResponse(list(municipios), safe=False)
 
 # Create your views here.
 @login_required

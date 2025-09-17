@@ -1,5 +1,5 @@
 from django import forms
-from .models import Usuario, Programa
+from .models import Usuario, Programa, Departamento, Municipio
 
 class InicioSesionForm(forms.Form):
     email = forms.EmailField(label="Correo electrónico")
@@ -92,8 +92,32 @@ class CursoForm(forms.Form):
     duracionprograma = forms.CharField(label="Duración (Horas)", max_length=50, widget=forms.TextInput(attrs={"readonly": "readonly"}))
     fechainicio = forms.DateField(label="Fecha de inicio", widget=forms.DateInput(attrs={'type': 'date'}))
     fechafin = forms.DateField(label="Fecha de finalización", widget=forms.DateInput(attrs={'type': 'date'}))
-    departamento = forms.CharField(label="Departamento", max_length=100)
-    municipio = forms.CharField(label="Municipio", max_length=100)
+    departamento = forms.ModelChoiceField(
+            queryset=Departamento.objects.all(),
+            label="Departamento",
+            empty_label="Seleccione un departamento"
+    )
+    municipio = forms.ModelChoiceField(
+            queryset=Municipio.objects.none(),   # se llena dinámicamente
+            label="Municipio",
+            empty_label="Seleccione un municipio"
+    )
+
+    def __init__(self, *args, **kwargs):
+            super().__init__(*args, **kwargs)
+
+            # Si viene departamento en POST (cuando envías el form)
+            if "departamento" in self.data:
+                try:
+                    departamento_id = int(self.data.get("departamento"))
+                    self.fields["municipio"].queryset = Municipio.objects.filter(departamento_id=departamento_id)
+                except (ValueError, TypeError):
+                    self.fields["municipio"].queryset = Municipio.objects.none()
+
+            # Si hay un departamento inicial (ej. edición de un curso)
+            elif self.initial.get("departamento"):
+                self.fields["municipio"].queryset = Municipio.objects.filter(departamento=self.initial["departamento"])
+
     direccion = forms.CharField(label="Dirección", max_length=200)
     nombre = forms.CharField(label="Nombre responsable", max_length=200)
     tipodoc = forms.ChoiceField(choices=[("CC", "CC"), ("TI", "TI"), ("CE", "CE")], label="Tipo documento")

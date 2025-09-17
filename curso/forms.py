@@ -1,6 +1,11 @@
 from django import forms
 from .models import Usuario
 
+class InicioSesionForm(forms.Form):
+    email = forms.EmailField(label="Correo electrónico")
+    password = forms.CharField(widget=forms.PasswordInput, label="Contraseña")
+
+    
 class UsuarioCreateForm(forms.ModelForm):
     password = forms.CharField(
         widget=forms.PasswordInput,

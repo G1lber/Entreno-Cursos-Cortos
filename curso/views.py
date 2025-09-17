@@ -21,6 +21,7 @@ from django.conf import settings
 from .forms import CursoForm
 from docxtpl import DocxTemplate
 
+@login_required
 def generar_curso(request):
     if request.method == "POST":
         form = CursoForm(request.POST)

@@ -60,10 +60,6 @@ def generar_curso(request):
 
     return render(request, "formularios/formulario-formato.html", {"form": form})
 
-@login_required
-def index(request):
-    return render(request, 'layout/index.html')
-
 def inicioSesion(request):
     if request.method == 'POST':
         form = InicioSesionForm(request.POST)

@@ -1,0 +1,31 @@
+{%load static%}
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>{% block title %}Sistema de Gestión de Cursos{% endblock %}</title>
+  <link rel="stylesheet" href="{% static 'css/base_nav.css' %}">
+</head>
+<body>
+  <!-- Barra superior -->
+  <header class="topbar">
+    <div class="logo-section">
+      <div class="logo">SGC</div>
+      <span class="system-name">Sistema de Gestión de Cursos</span>
+    </div>
+    <div class="user-section">
+      <span class="user-email">👤 {{ user.email }} asd</span>
+      <form method="post" action="{% url 'logout' %}">
+        {% csrf_token %}
+        <button type="submit" class="logout-btn">↪ Cerrar Sesión</button>
+      </form>
+    </div>
+  </header>
+
+  <!-- Contenido de la página -->
+  <main class="content">
+    {% block content %} {% endblock %}
+  </main>
+</body>
+</html>

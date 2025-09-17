@@ -27,6 +27,7 @@ def inicioSesion(request):
         form = InicioSesionForm()
     return render(request, 'layout/inicioSesion.html', {'form': form})
 
+
 def log_out(request):
     logout(request)  # elimina la sesión del usuario
     messages.success(request, "Has cerrado sesión correctamente.")

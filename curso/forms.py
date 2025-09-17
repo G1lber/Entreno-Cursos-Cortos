@@ -5,7 +5,7 @@ class InicioSesionForm(forms.Form):
     email = forms.EmailField(label="Correo electrónico")
     password = forms.CharField(widget=forms.PasswordInput, label="Contraseña")
 
-    
+
 class UsuarioCreateForm(forms.ModelForm):
     password = forms.CharField(
         widget=forms.PasswordInput,
@@ -67,7 +67,10 @@ class UsuarioEditForm(forms.ModelForm):
             "firma",
             "password",
         ]
-
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['documento'].disabled = True    
+        
     def save(self, commit=True):
         usuario = super().save(commit=False)
         password = self.cleaned_data.get("password")
@@ -76,3 +79,4 @@ class UsuarioEditForm(forms.ModelForm):
         if commit:
             usuario.save()
         return usuario
+    

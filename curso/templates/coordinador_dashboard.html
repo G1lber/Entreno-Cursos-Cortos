@@ -1,14 +1,13 @@
+{% extends "base_nav.html" %}
+
 {% load static %}
 
-{% extends "index.html" %}
-
-{% block title %}Panel del Coordinador{% endblock %}
-
+{%block content%}
 <html lang="es">
 <head>
   <meta charset="UTF-8">
   <title>Dashboard de Coordinador</title>
-  <link rel="stylesheet" href="{% static 'css/coordinator.css' %}">
+  <link rel="stylesheet" href="{% static 'css/coordinador.css' %}">
 </head>
 <body>
   <div class="container">
@@ -118,3 +117,4 @@
     </div>
   </div>
 </body>
+{%endblock%}

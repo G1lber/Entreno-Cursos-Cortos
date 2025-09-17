@@ -1,5 +1,5 @@
-# Entreno-Curos-Cortos
-## Librerias necesrias
+# Entreno-Cursos-Cortos
+## Librerias necesarias
 
 * python -m pip install mysqlclient
 

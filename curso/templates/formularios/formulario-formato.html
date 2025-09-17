@@ -1,14 +1,153 @@
-<html lang="es">
-<head>
-  <meta charset="UTF-8">
-  <title>Generar curso</title>
-</head>
-<body>
-  <h1>Formulario Curso</h1>
-  <form method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">Generar Word</button>
-  </form>
-</body>
+{%load static%}
+
+<html lang="es"> 
+  <head> 
+    <meta charset="UTF-8"> 
+    <title>Generar curso</title> 
+    <link rel="stylesheet" href="{% static 'css/forms.css' %}">
+  </head> 
+  <body> 
+      <h1>Formulario Curso</h1>
+        <form method="post">
+          {% csrf_token %}
+
+          <!-- DATOS DEL PROGRAMA -->
+          <div class="form-section">
+            <h2>Datos del programa</h2>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="{{ form.codigoprograma.id_for_label }}">Código del programa</label>
+                {{ form.codigoprograma }}
+              </div>
+              <div class="form-group">
+                <label for="{{ form.nombreprograma.id_for_label }}">Nombre del programa</label>
+                {{ form.nombreprograma }}
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="{{ form.versionprograma.id_for_label }}">Versión</label>
+                {{ form.versionprograma }}
+              </div>
+              <div class="form-group">
+                <label for="{{ form.duracionprograma.id_for_label }}">Duración (Horas)</label>
+                {{ form.duracionprograma }}
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="{{ form.fechainicio.id_for_label }}">Fecha inicio</label>
+                {{ form.fechainicio }}
+              </div>
+              <div class="form-group">
+                <label for="{{ form.fechafin.id_for_label }}">Fecha fin</label>
+                {{ form.fechafin }}
+              </div>
+            </div>
+          </div>
+
+          <!-- UBICACIÓN -->
+          <div class="form-section">
+            <h2>Ubicación</h2>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="{{ form.departamento.id_for_label }}">Departamento</label>
+                {{ form.departamento }}
+              </div>
+              <div class="form-group">
+                <label for="{{ form.municipio.id_for_label }}">Municipio</label>
+                {{ form.municipio }}
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="{{ form.direccion.id_for_label }}">Dirección</label>
+              {{ form.direccion }}
+            </div>
+          </div>
+
+          <!-- RESPONSABLE -->
+          <div class="form-section">
+            <h2>Responsable</h2>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="{{ form.nombre.id_for_label }}">Nombre responsable</label>
+                {{ form.nombre }}
+              </div>
+              <div class="form-group">
+                <label for="{{ form.tipodoc.id_for_label }}">Tipo documento</label>
+                {{ form.tipodoc }}
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="{{ form.numerodoc.id_for_label }}">Número de documento</label>
+                {{ form.numerodoc }}
+              </div>
+              <div class="form-group">
+                <label for="{{ form.correo.id_for_label }}">Correo electrónico</label>
+                {{ form.correo }}
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="{{ form.empresa.id_for_label }}">Empresa solicitante</label>
+              {{ form.empresa }}
+            </div>
+          </div>
+
+          <!-- DETALLES DEL CURSO -->
+          <div class="form-section">
+            <h2>Detalles del curso</h2>
+
+            <div class="form-group">
+              <label for="{{ form.programa_especial.id_for_label }}">Programa especial</label>
+              {{ form.programa_especial }}
+            </div>
+
+            <div class="form-group">
+              <label>Días</label>
+              <div class="checkbox-group">
+                {{ form.dias }}
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="{{ form.horario.id_for_label }}">Horario del curso</label>
+                {{ form.horario }}
+              </div>
+              <div class="form-group">
+                <label for="{{ form.fecha1.id_for_label }}">Fechas mes 1</label>
+                {{ form.fecha1 }}
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="{{ form.fecha2.id_for_label }}">Fechas mes 2</label>
+                {{ form.fecha2 }}
+              </div>
+              <div class="form-group">
+                <label for="{{ form.firma.id_for_label }}">Firma instructor</label>
+                {{ form.firma }}
+              </div>
+            </div>
+          </div>
+
+          <!-- BOTONES -->
+          <div class="form-actions">
+            <button type="submit" class="button-primary">Generar Word</button>
+            <button type="reset" class="button-outline">Cancelar</button>
+          </div>
+        </form>
+
+
+  </body> 
 </html>

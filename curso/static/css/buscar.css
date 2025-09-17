@@ -1,0 +1,156 @@
+/* Contenedor general */
+.container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 20px;
+  font-family: Arial, sans-serif;
+  color: #333;
+}
+
+/* Botón volver */
+.back-link {
+  display: inline-block;
+  margin-bottom: 10px;
+  color: #555;
+  font-size: 14px;
+  text-decoration: none;
+}
+.back-link:hover {
+  color: #000;
+}
+
+/* Títulos */
+h1 {
+  font-size: 24px;
+  margin-bottom: 5px;
+}
+.subtitle {
+  color: #666;
+  margin-bottom: 20px;
+}
+.results-title {
+  margin: 20px 0 10px;
+  font-size: 18px;
+  font-weight: bold;
+}
+
+/* Barra de búsqueda */
+.search-bar {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+.search-bar input {
+  flex: 1;
+  padding: 8px 10px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+}
+.search-bar button {
+  padding: 8px 16px;
+  border: 1px solid #ccc;
+  background: #f3f3f3;
+  border-radius: 6px;
+  cursor: pointer;
+}
+.search-bar button:hover {
+  background: #e0e0e0;
+}
+
+/* Curso card */
+.course-card {
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  padding: 16px;
+  margin-bottom: 16px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+}
+
+/* Cabecera de curso */
+.course-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+.course-header h3 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: bold;
+}
+.course-header .instructor {
+  font-size: 14px;
+  color: #666;
+}
+.course-header .description {
+  font-size: 13px;
+  color: #444;
+}
+
+/* Tags */
+.tags {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.tag {
+  font-size: 12px;
+  padding: 3px 8px;
+  border-radius: 6px;
+  font-weight: 500;
+}
+.tag.pending {
+  background: #fff3cd;
+  color: #856404;
+}
+.tag.active {
+  background: #d4edda;
+  color: #155724;
+}
+.tag.rejected {
+  background: #f8d7da;
+  color: #721c24;
+}
+.tag.neutral {
+  background: #f0f0f0;
+  color: #555;
+}
+
+/* Detalles del curso */
+.course-details {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 8px;
+  margin-top: 10px;
+  font-size: 14px;
+  color: #333;
+}
+
+/* Footer del curso */
+.course-footer {
+  margin-top: 12px;
+  font-size: 13px;
+  color: #666;
+}
+.course-footer a {
+  color: #007bff;
+  text-decoration: none;
+}
+.course-footer a:hover {
+  text-decoration: underline;
+}
+
+/* Alertas */
+.alert {
+  padding: 10px;
+  border-radius: 6px;
+  margin-bottom: 15px;
+}
+.alert.error {
+  background: #f8d7da;
+  color: #721c24;
+}
+.alert.success {
+  background: #d4edda;
+  color: #155724;
+}

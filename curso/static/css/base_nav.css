@@ -1,0 +1,71 @@
+/* Barra superior fija */
+.topbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #39A900;
+  border-bottom: 1px solid #e5e5e5;
+  padding: 8px 30px;
+  font-family: Arial, sans-serif;
+  z-index: 1000;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.08);
+  box-sizing: border-box;
+}
+
+/* Ajustar contenido para que no quede oculto */
+.content {
+  padding-top: 60px; /* altura aproximada de la barra */
+}
+
+/* Logo + texto */
+.logo-section {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.logo {
+  background: #002d46;
+  color: white;
+  font-weight: bold;
+  padding: 6px 10px;
+  border-radius: 8px;
+  font-size: 14px;
+}
+.system-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: #333;
+}
+
+/* Usuario */
+.user-section {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.user-email {
+  font-size: 13px;
+  color: #555;
+}
+
+/* Botón cerrar sesión */
+.logout-btn {
+  font-size: 13px;
+  font-weight: 600;
+  border: 1px solid #ccc;
+  background: #ffff;
+  color: #000000;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s;
+}
+.logout-btn:hover {
+  background: #04689e;
+  border-color: #999;
+  color: rgb(0, 0, 0);
+}

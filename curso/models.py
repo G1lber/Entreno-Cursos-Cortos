@@ -56,7 +56,6 @@ class Usuario(AbstractUser):
     username = None  # Eliminamos username, usamos email
     email = models.EmailField("correo electrónico", max_length=50,unique=True)
 
-
     tipo_documento = models.ForeignKey(
         "TipoDocumento",
         on_delete=models.CASCADE,
@@ -68,7 +67,7 @@ class Usuario(AbstractUser):
         on_delete=models.CASCADE,
         related_name="usuarios"
     )
-    firma = models.FileField(upload_to="firmas/", null=True, blank=True)
+    firma = models.ImageField(upload_to='firma/', null=True, blank=True)
 
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = []  # para createsuperuser

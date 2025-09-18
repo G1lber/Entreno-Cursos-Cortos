@@ -21,27 +21,13 @@
         <div class="card shadow-sm border border-success text-center w-100 h-100">
           <div class="card-body d-flex flex-column justify-content-between">
             <div>
-              <h5 class="card-title">Buscar Cursos</h5>
-              <p class="text-muted">Explora y busca cursos disponibles en el sistema.</p>
+              <h5 class="card-title">Cursos</h5>
+              <p class="text-muted">Crea y explora cursos disponibles en el sistema.</p>
             </div>
-            <a href="{% url "buscar_curso" %}" class="btn btn-success mt-3 w-100">Buscar Cursos</a>
+            <a href="{% url "buscar_curso" %}" class="btn btn-success mt-3 w-100">Cursos</a>
           </div>
         </div>
       </div>
-      <div class="col-md-5 col-lg-4 d-flex">
-        <div class="card shadow-sm border border-success text-center w-100 h-100">
-          <div class="card-body d-flex flex-column justify-content-between">
-            <div>
-              <h5 class="card-title">Enviar Solicitud</h5>
-              <p class="text-muted">Envía una solicitud para crear un nuevo curso.</p>
-            </div>
-
-            <a href="{% url 'generar_curso' %}" class="btn btn-success mt-3 w-100">Enviar Solicitud</a>
-
-          </div>
-        </div>
-      </div>
-    </div>
 
     <!-- Administración -->
     <h4 class="mb-3 text-center">Administración</h4>

@@ -53,4 +53,9 @@ urlpatterns = [
     path("get-programa/<int:programa_id>/", views.get_programa, name="get_programa"),
     # Obtener municipios por departamento
     path("get-municipios/<int:departamento_id>/", views.get_municipios, name="get_municipios"),
+    
+    # aprobar - rechazar solicitudes
+    path("solicitud/<int:pk>/aprobar/", views.approve_request, name="approve_request"),
+    path("solicitud/<int:pk>/rechazar/", views.reject_request, name="reject_request"),
+    
 ]

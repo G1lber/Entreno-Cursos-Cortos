@@ -166,40 +166,29 @@ class CursoForm(forms.Form):
     duracionprograma = forms.CharField(label="Duración (Horas)", max_length=50, widget=forms.TextInput(attrs={"readonly": "readonly"}))
     fechainicio = forms.DateField(label="Fecha de inicio", widget=forms.DateInput(attrs={'type': 'date'}))
     fechafin = forms.DateField(label="Fecha de finalización", widget=forms.DateInput(attrs={'type': 'date'}))
+
     departamento = forms.ModelChoiceField(
-            queryset=Departamento.objects.all(),
-            label="Departamento",
-            empty_label="Seleccione un departamento"
+        queryset=Departamento.objects.all(),
+        label="Departamento",
+        empty_label="Seleccione un departamento"
     )
     municipio = forms.ModelChoiceField(
-            queryset=Municipio.objects.none(),   # se llena dinámicamente
-            label="Municipio",
-            empty_label="Seleccione un municipio"
+        queryset=Municipio.objects.none(),   # se llena dinámicamente
+        label="Municipio",
+        empty_label="Seleccione un municipio"
     )
 
-    def __init__(self, *args, **kwargs):
-            super().__init__(*args, **kwargs)
-
-            # Si viene departamento en POST (cuando envías el form)
-            if "departamento" in self.data:
-                try:
-                    departamento_id = int(self.data.get("departamento"))
-                    self.fields["municipio"].queryset = Municipio.objects.filter(departamento_id=departamento_id)
-                except (ValueError, TypeError):
-                    self.fields["municipio"].queryset = Municipio.objects.none()
-
-            # Si hay un departamento inicial (ej. edición de un curso)
-            elif self.initial.get("departamento"):
-                self.fields["municipio"].queryset = Municipio.objects.filter(departamento=self.initial["departamento"])
-
     direccion = forms.CharField(label="Dirección", max_length=200)
-    nombre = forms.CharField(label="Nombre responsable", max_length=200)
-    tipodoc = forms.ChoiceField(choices=[("CC", "CC"), ("TI", "TI"), ("CE", "CE")], label="Tipo documento")
-    numerodoc = forms.CharField(label="Número de documento", max_length=50)
-    correo = forms.EmailField(label="Correo electrónico")
-    empresa = forms.CharField(label="Empresa solicitante", max_length=200, required=False)
 
-    # Programa especial (selección única)
+    # Datos del usuario (solo lectura, no requeridos porque no se envían en POST)
+    nombre = forms.CharField(label="Nombre responsable", max_length=200, disabled=True, required=False)
+    tipodoc = forms.CharField(label="Tipo documento", disabled=True, required=False)
+    numerodoc = forms.CharField(label="Número de documento", max_length=50, disabled=True, required=False)
+    correo = forms.EmailField(label="Correo electrónico", disabled=True, required=False)
+
+    empresa = forms.CharField(label="Empresa solicitante", max_length=200, required=False)
+    carta_empresa = forms.FileField(label="Carta de empresa", required=False)
+
     PROGRAMA_CHOICES = [
         ("SENA EMPREDE RURAL", "SENA EMPREDE RURAL"),
         ("SENA EMPRENDE RURAL- POST CONFLICTO (ETCR)", "SENA EMPRENDE RURAL- POST CONFLICTO (ETCR)"),
@@ -219,7 +208,6 @@ class CursoForm(forms.Form):
     ]
     programa_especial = forms.ChoiceField(choices=PROGRAMA_CHOICES, label="Programa Especial")
 
-    # Días (selección múltiple)
     DIAS_CHOICES = [
         ("LUN", "Lunes"),
         ("MAR", "Martes"),
@@ -229,9 +217,57 @@ class CursoForm(forms.Form):
         ("SAB", "Sábado"),
         ("DOM", "Domingo"),
     ]
-    dias = forms.MultipleChoiceField(choices=DIAS_CHOICES, widget=forms.CheckboxSelectMultiple, label="Días de la semana")
+    dias = forms.MultipleChoiceField(
+        choices=DIAS_CHOICES,
+        widget=forms.CheckboxSelectMultiple,
+        label="Días de la semana"
+    )
 
     horario = forms.CharField(label="Horario del curso", max_length=100)
     fecha1 = forms.CharField(label="Fechas de ejecución (mes 1)", max_length=200)
     fecha2 = forms.CharField(label="Fechas de ejecución (mes 2)", max_length=200, required=False)
     firma = forms.CharField(label="Firma instructor", required=False)
+
+    def __init__(self, *args, **kwargs):
+        usuario = kwargs.pop("usuario", None)
+        super().__init__(*args, **kwargs)
+
+        # Manejo dinámico de municipios
+        if "departamento" in self.data:
+            try:
+                departamento_id = int(self.data.get("departamento"))
+                self.fields["municipio"].queryset = Municipio.objects.filter(departamento_id=departamento_id)
+            except (ValueError, TypeError):
+                self.fields["municipio"].queryset = Municipio.objects.none()
+        elif self.initial.get("departamento"):
+            self.fields["municipio"].queryset = Municipio.objects.filter(departamento=self.initial["departamento"])
+
+        # Prellenar datos del usuario autenticado
+        if usuario:
+            self.fields["nombre"].initial = f"{usuario.first_name} {usuario.last_name}".strip()
+            self.fields["tipodoc"].initial = usuario.tipo_documento.nombre
+            self.fields["numerodoc"].initial = usuario.documento
+            self.fields["correo"].initial = usuario.email
+
+from django import forms
+
+class AspiranteForm(forms.Form):
+    nombre = forms.CharField(
+        label="Nombre completo",
+        max_length=200,
+        widget=forms.TextInput(attrs={"class": "form-control"})
+    )
+    documento = forms.CharField(
+        label="Número de documento",
+        max_length=50,
+        widget=forms.TextInput(attrs={"class": "form-control"})
+    )
+    correo = forms.EmailField(
+        label="Correo electrónico",
+        widget=forms.EmailInput(attrs={"class": "form-control"})
+    )
+    telefono = forms.CharField(
+        label="Teléfono de contacto",
+        max_length=20,
+        widget=forms.TextInput(attrs={"class": "form-control"})
+    )

@@ -14,7 +14,7 @@
       <h2 class="fw-bold">Panel de Control</h2>
       <p class="text-muted">Gestiona cursos e inscripciones de manera eficiente</p>
     </div>
-    
+
     <!-- Acciones -->
     <div class="row g-4 mb-5 justify-content-center align-items-stretch">
       <div class="col-md-5 col-lg-4 d-flex">
@@ -35,7 +35,9 @@
               <h5 class="card-title">Enviar Solicitud</h5>
               <p class="text-muted">Envía una solicitud para crear un nuevo curso.</p>
             </div>
+
             <a href="{% url 'generar_curso' %}" class="btn btn-success mt-3 w-100">Enviar Solicitud</a>
+
           </div>
         </div>
       </div>
@@ -62,7 +64,9 @@
               <h5 class="card-title">Reportes Excel</h5>
               <p class="text-muted">Genera y descarga reportes de inscripciones.</p>
             </div>
+
             <a href="{% url "reportes" %}" class="btn btn-success w-100 mt-3">Reportes Excel</a>
+
           </div>
         </div>
       </div>

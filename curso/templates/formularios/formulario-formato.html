@@ -8,7 +8,7 @@
   </head> 
   <body> 
       <h1>Formulario Curso</h1>
-        <form method="post">
+        <form method="post" enctype="multipart/form-data">
           {% csrf_token %}
 
           <!-- DATOS DEL PROGRAMA -->
@@ -36,30 +36,6 @@
                 <label for="{{ form.duracionprograma.id_for_label }}">Duración (Horas)</label>
                 {{ form.duracionprograma }}
               </div>
-            </div>
-
-            
-          </div>
-
-          <!-- UBICACIÓN -->
-          <div class="form-section">
-            <h2>Ubicación</h2>
-
-            <div class="form-row">
-              <div class="form-group">
-                <label for="{{ form.departamento.id_for_label }}">Departamento</label>
-                {{ form.departamento }}
-              </div>
-
-              <div class="form-group">
-                <label for="{{ form.municipio.id_for_label }}">Municipio</label>
-                {{ form.municipio }}
-              </div>
-            </div>
-
-            <div class="form-group">
-              <label for="{{ form.direccion.id_for_label }}">Dirección</label>
-              {{ form.direccion }}
             </div>
           </div>
 
@@ -90,6 +66,28 @@
             </div>
           </div>
 
+          <!-- UBICACIÓN -->
+          <div class="form-section">
+            <h2>Ubicación</h2>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="{{ form.departamento.id_for_label }}">Departamento</label>
+                {{ form.departamento }}
+              </div>
+
+              <div class="form-group">
+                <label for="{{ form.municipio.id_for_label }}">Municipio</label>
+                {{ form.municipio }}
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="{{ form.direccion.id_for_label }}">Dirección</label>
+              {{ form.direccion }}
+            </div>
+          </div>
+
           <!-- DETALLES DEL CURSO -->
           <div class="form-section">
             <h2>Detalles del curso</h2>
@@ -98,19 +96,40 @@
               <label for="{{ form.programa_especial.id_for_label }}">Programa especial</label>
               {{ form.programa_especial }}
             </div>
-            <div class="form-group">
+           <div class="form-group">
               <label for="{{ form.empresa.id_for_label }}">Empresa solicitante</label>
               {{ form.empresa }}
             </div>
+
+            <div class="form-group" id="carta-empresa-wrapper" style="display: none;">
+              <label for="{{ form.carta_empresa.id_for_label }}">Carta de empresa</label>
+              {{ form.carta_empresa }}
+            </div>
+
+            <script>
+              document.addEventListener("DOMContentLoaded", function () {
+                const empresaInput = document.getElementById("{{ form.empresa.id_for_label }}");
+                const cartaWrapper = document.getElementById("carta-empresa-wrapper");
+
+                empresaInput.addEventListener("input", function () {
+                  if (this.value.trim() !== "") {
+                    cartaWrapper.style.display = "block";
+                  } else {
+                    cartaWrapper.style.display = "none";
+                  }
+                });
+              });
+            </script>
             <div class="form-row">
               <div class="form-group">
                 <label for="{{ form.fechainicio.id_for_label }}">Fecha inicio</label>
                 {{ form.fechainicio }}
               </div>
               <div class="form-group">
-                <label for="{{ form.fechafin.id_for_label }}">Fecha fin</label>
-                {{ form.fechafin }}
+                <label for="{{ form.fecha1.id_for_label }}">Fechas mes 1</label>
+                {{ form.fecha1 }}
               </div>
+              
             </div>
             <div class="form-group">
               <label>Días</label>
@@ -119,16 +138,10 @@
               </div>
             </div>
 
-            <div class="form-row">
               <div class="form-group">
                 <label for="{{ form.horario.id_for_label }}">Horario del curso</label>
                 {{ form.horario }}
               </div>
-              <div class="form-group">
-                <label for="{{ form.fecha1.id_for_label }}">Fechas mes 1</label>
-                {{ form.fecha1 }}
-              </div>
-            </div>
 
             <div class="form-row">
               <div class="form-group">
@@ -136,15 +149,19 @@
                 {{ form.fecha2 }}
               </div>
               <div class="form-group">
+                <label for="{{ form.fechafin.id_for_label }}">Fecha fin</label>
+                {{ form.fechafin }}
+              </div>
+            </div>
+            <div class="form-group">
                 <label for="{{ form.firma.id_for_label }}">Firma instructor</label>
                 {{ form.firma }}
               </div>
-            </div>
           </div>
 
           <!-- BOTONES -->
           <div class="form-actions">
-            <button type="submit" class="button-primary">Generar Word</button>
+            <button type="submit" class="button-primary">Crear Curso</button>
             <button type="reset" class="button-outline">Cancelar</button>
           </div>
         </form>

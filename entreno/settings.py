@@ -37,6 +37,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    "msgraphbackend",
+    "anymail",
     'curso'
 ]
 
@@ -79,10 +81,11 @@ DATABASES = {
         'ENGINE': 'django.db.backends.mysql',   # Driver MySQL
         'NAME': 'cursos_cortos',                      # Nombre de tu base de datos
         'USER': 'root',                        # Usuario de MySQL
-        'PASSWORD': '',             # Contraseña
+        'PASSWORD': 'root',             # Contraseña
         'HOST': '127.0.0.1',                   # Servidor (localhost)
         'PORT': '3306',                        # Puerto por defecto MySQL
         'OPTIONS': {
+            'charset': 'utf8mb4',
             'init_command': "SET sql_mode='STRICT_TRANS_TABLES'"
         }
     }
@@ -140,10 +143,16 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # Configuración para Hotmail/Outlook
 #EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'smtp.office365.com'
-EMAIL_PORT = 587
-EMAIL_USE_TLS = True
-EMAIL_HOST_USER = 'ADSO602@hotmail.com'       # tu correo real
-EMAIL_HOST_PASSWORD = 'uepmwpwhhdcdysak'     # contraseña real de la cuenta
-DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+
+EMAIL_BACKEND = "curso.msgraphbackend.MSGraphBackend"
+
+
+
+MSGRAPH_TENANT_ID = "consumers"  # 👈 para Hotmail/Outlook
+MSGRAPH_CLIENT_ID = "bd7ebf26-a29c-4197-97b4-fba9ff43cd9e"
+MSGRAPH_CLIENT_SECRET = "kIi8Q~IUuBGkkO7JR9aczVkUvt3rQfXroO5bOddF"
+MSGRAPH_USER_ID = "ADSO602@hotmail.com"
+DEFAULT_FROM_EMAIL = "ADSO602@hotmail.com"
+
+MSGRAPH_REDIRECT_URI = "https://jwt.ms"  # 👈 importante
+

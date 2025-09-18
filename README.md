@@ -7,6 +7,10 @@
 
 * pip install docxtpl
 
+* pip install pip install django-anymail[graph]
+* pip install "django-anymail[microsoft]"
+
+
 # Entreno-Cursos-Cortos
 ### SenaSoft
 ![VS Code](https://img.shields.io/badge/VS%20Code-0078D4?style=for-the-badge&logo=visual-studio-code&logoColor=white)

@@ -1,8 +1,7 @@
 {% extends "base_nav.html" %}
+{% load static %}
 
-{%load static%}
-
-{%block content%}
+{% block content %}
 <link rel="stylesheet" href="{% static 'css/buscar.css' %}">
 <div class="container">
   <!-- Botón volver -->
@@ -14,28 +13,44 @@
 
   <!-- Barra de búsqueda -->
   <form method="get" class="search-bar">
-    <input type="text" name="q" placeholder="Buscar por programa, municipio, instructor o modalidad...">
+    <input type="text" name="q" placeholder="Buscar por programa, municipio, instructor o modalidad..." value="{{ q }}">
     <button type="submit">Buscar</button>
   </form>
 
-  <!-- Lista de cursos -->
+  <!-- Resultados -->
   <h2 class="results-title">Cursos Encontrados ({{ courses|length }})</h2>
 
   {% if not q %}
-    <div class="alert info">Realiza una busqueda para ver los resultados aqui!!</div>
+    <div class="alert info">Realiza una búsqueda para ver los resultados aquí!!</div>
   {% elif not courses %}
     <div class="alert error">No se encontraron cursos</div>
   {% else %}
-    <div class="courses-list">
-      {% for course in courses %}
-        <div class="course-card">
-          <div class="course-header">
-            <div>
-              <h3>{{ course.program }}</h3>
-              <p class="instructor">Programa: {{ course.programa.nombre }}</p>
-              {% if course.description %}<p class="description">{{ course.description }}</p>{% endif %}
-            </div>
-            <div class="tags">
+    <div class="table-container">
+      <table class="results-table">
+        <thead>
+          <tr>
+            <th>Programa</th>
+            <th>Código</th>
+            <!-- <th>Duración</th> -->
+            <th>Instructor</th>
+            <th>Inicio</th>
+            <th>Fin</th>
+            <th>Estado</th>
+            <th>Inscritos</th>
+            <th>Inscripción</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for course in courses %}
+          <tr>
+            <td>{{ course.programa.nombre }}</td>
+            <td>{{ course.programa.codigo }}</td>
+            <!-- <td>{{ course.programa.duracion }}</td> -->
+            <td>{{ course.usuario.first_name }} {{ course.usuario.last_name }}</td>
+            <td>{{ course.fecha_inicio|date:"d/m/Y" }}</td>
+            <td>{{ course.fecha_fin|date:"d/m/Y" }}</td>
+            <td>
               {% if course.status == "pending" %}
                 <span class="tag pending">Pendiente</span>
               {% elif course.status == "approved" %}
@@ -43,31 +58,22 @@
               {% else %}
                 <span class="tag rejected">Rechazado</span>
               {% endif %}
-              <span class="tag neutral">0/25 inscritos</span>
-            </div>
-          </div>
-
-          <div class="course-details">
-              <p>📅 Inicio: {{ course.fecha_inicio|date:"d/m/Y" }}</p>
-              <p>📅 Fin: {{ course.fecha_fin|date:"d/m/Y" }}</p>
-              <p>⏳ Duración del programa: {{ course.programa.duracion }}</p>
-              <p>🏷️ Código del programa: {{ course.programa.codigo }}</p>
-              <p>👨‍🏫 Instructor: {{ course.usuario.first_name }} {{ course.usuario.last_name }}</p>
-              <p>📧 Contacto: {{ course.usuario.email }}</p>
-          </div>
-
-          <div class="course-footer">
-            {% if course.status == "pending" %}
-              La solicitud está pendiente de aprobación
-            {% elif course.status == "approved" %}
-              Curso aprobado. <a href="{{ course.registrationLink }}" target="_blank">Abrir Link</a>
-            {% else %}
-              La solicitud fue rechazada
-            {% endif %}
-          </div>
-        </div>
-      {% endfor %}
+            </td>
+            <td>0/25</td>
+            <td>
+              <a href="{{ course.registrationLink }}" target="_blank">Link</a>
+            </td>
+            <td>
+              <form method="post" action="#">
+                {% csrf_token %}
+                <button type="submit" class="btn-solicitar">Solicitar</button>
+              </form>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
     </div>
   {% endif %}
 </div>
-{%endblock%}
+{% endblock %}

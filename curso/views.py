@@ -27,30 +27,25 @@ def buscar_curso(request):
     q = request.GET.get("q", "").strip()
     courses = []
 
-    if q:  # solo buscar si hay algo en q
-        # Subquery para traer el estado de la solicitud vinculada
-        estado_subquery = Solucitud.objects.filter(
-            curso=OuterRef("pk")
-        ).values("estado")[:1]
-
+    if q:
         courses = Curso.objects.filter(
             Q(programa__nombre__icontains=q) |
             Q(usuario__first_name__icontains=q) |
             Q(usuario__last_name__icontains=q) |
             Q(usuario__documento__icontains=q)
-        ).annotate(
-            estado_solicitud=Subquery(estado_subquery)
         )
 
-        # opcional: mapear el número a texto
+        # mapear estado numérico a texto
         estado_map = {0: "pending", 1: "approved", 2: "rejected"}
         for c in courses:
-            c.status = estado_map.get(c.estado_solicitud, "pending")
+            c.status = estado_map.get(c.estado, "pending")
+            c.registrationLink = c.link  # 👈 usar el campo `link` del modelo
 
     return render(request, "buscar_curso.html", {
         "courses": courses,
         "q": q
     })
+
 
 #Coordinador
 def coordinador(request):

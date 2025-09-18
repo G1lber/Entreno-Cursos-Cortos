@@ -54,7 +54,7 @@ from django.db import models
 from .managers import UsuarioManager
 class Usuario(AbstractUser):
     username = None  # Eliminamos username, usamos email
-    email = models.EmailField("correo electrónico", unique=True)
+    email = models.EmailField("correo electrónico",max_length=191, unique=True)
 
     tipo_documento = models.ForeignKey(
         "TipoDocumento",

@@ -90,6 +90,10 @@ class Curso(models.Model):
     fecha_inicio = models.DateTimeField()
     fecha_fin = models.DateTimeField()
     estado = models.IntegerField(null=True, blank=True)
+    caracterizacion = models.CharField(max_length=50, null=True, blank=True)
+    carta = models.CharField(max_length=50, null=True, blank=True)
+    pdf_documentos = models.CharField(max_length=50, null=True, blank=True)
+    aspirantes = models.CharField(max_length=50, null=True, blank=True)
 
     def __str__(self):
         return f"Curso {self.id} - {self.programa}"

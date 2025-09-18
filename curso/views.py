@@ -1,5 +1,5 @@
 from django.shortcuts import redirect, get_object_or_404
-from .models import TipoDocumento, Rol, Usuario,Programa, Departamento, Municipio
+from .models import TipoDocumento, Rol, Usuario,Programa, Departamento, Municipio, Curso
 from .forms import UsuarioEditForm, UsuarioCreateForm, InicioSesionForm
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
@@ -27,54 +27,82 @@ def coordinador(request):
 def reportes(request):
     return render(request, 'reportes.html')
 
+import os
+from django.conf import settings
+from django.http import HttpResponse
+from django.shortcuts import render
+from docxtpl import DocxTemplate
+from .forms import CursoForm
+from .models import Curso
+
+
 def generar_curso(request):
     usuario = request.user  # Usuario autenticado
 
     if request.method == "POST":
-        form = CursoForm(request.POST, usuario=usuario)  # 👈 pasamos usuario
+        form = CursoForm(request.POST, usuario=usuario)
         if form.is_valid():
             try:
-                # ✅ Obtener datos del formulario
-                contexto = form.cleaned_data
+                # ✅ Datos mínimos para crear el curso
+                programa = form.cleaned_data["nombreprograma"]
+                fecha_inicio = form.cleaned_data["fechainicio"]
+                fecha_fin = form.cleaned_data["fechafin"]
 
-                # ✅ Agregar datos del usuario al contexto
+                # ✅ Crear curso en BD (aún sin caracterización)
+                curso = Curso.objects.create(
+                    programa=programa,
+                    usuario=usuario,
+                    fecha_inicio=fecha_inicio,
+                    fecha_fin=fecha_fin,
+                )
+
+                # ✅ Preparar contexto para el documento
+                contexto = form.cleaned_data
                 contexto.update({
                     "nombre": f"{usuario.first_name} {usuario.last_name}".strip(),
-                    "tipodoc": usuario.tipo_documento.nombre,
+                    "tipodoc": usuario.tipo_documento.nombre if usuario.tipo_documento else "",
                     "numerodoc": usuario.documento,
                     "correo": usuario.email,
+                    "curso_id": curso.id,
                 })
 
-                print("✅ Datos del formulario + usuario:", contexto)
-
-                # ✅ Construir ruta absoluta de la plantilla
-                ruta = os.path.join(
+                # ✅ Ruta base donde está la plantilla
+                ruta_base = os.path.join(
                     settings.BASE_DIR,
                     "curso",
                     "templates",
-                    "docs",
-                    "plantilla-curso.docx"
+                    "docs"
                 )
-                if not os.path.exists(ruta):
-                    raise FileNotFoundError(f"No se encontró la plantilla en: {ruta}")
 
-                print(f"📄 Usando plantilla: {ruta}")
+                # ✅ Ruta de la plantilla
+                ruta_plantilla = os.path.join(ruta_base, "plantilla-curso.docx")
+                if not os.path.exists(ruta_plantilla):
+                    raise FileNotFoundError(f"No se encontró la plantilla en: {ruta_plantilla}")
 
-                # ✅ Cargar y renderizar documento
-                doc = DocxTemplate(ruta)
+                # ✅ Crear carpeta con el ID del curso
+                ruta_curso = os.path.join(ruta_base, str(curso.id))
+                os.makedirs(ruta_curso, exist_ok=True)
+
+                # ✅ Renderizar documento
+                doc = DocxTemplate(ruta_plantilla)
                 doc.render(contexto)
 
-                # ✅ Guardar en memoria
-                buffer = io.BytesIO()
-                doc.save(buffer)
-                buffer.seek(0)
+                # ✅ Guardar archivo en la carpeta del curso
+                nombre_docx = f"curso_{curso.id}.docx"
+                ruta_docx = os.path.join(ruta_curso, nombre_docx)
+                doc.save(ruta_docx)
 
-                # ✅ Respuesta HTTP con archivo generado
-                response = HttpResponse(
-                    buffer,
-                    content_type="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-                )
-                response["Content-Disposition"] = 'attachment; filename="curso_generado.docx"'
+                # ✅ Guardar la "URL relativa" en la BD (campo caracterizacion)
+                curso.caracterizacion = f"docs/{curso.id}/{nombre_docx}"
+                curso.save(update_fields=["caracterizacion"])
+
+                # ✅ Devolver archivo como descarga
+                with open(ruta_docx, "rb") as f:
+                    response = HttpResponse(
+                        f.read(),
+                        content_type="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+                    )
+                response["Content-Disposition"] = f'attachment; filename="{nombre_docx}"'
                 return response
 
             except Exception as e:
@@ -84,9 +112,8 @@ def generar_curso(request):
             print("❌ Formulario inválido:", form.errors)
 
     else:
-        form = CursoForm(usuario=usuario)  # 👈 inicializamos con datos del usuario
+        form = CursoForm(usuario=usuario)
 
-    # Si es GET o si el form es inválido, renderiza el form
     return render(request, "formularios/formulario-formato.html", {"form": form})
 # Obtener datos del programa
 def get_programa(request, programa_id):

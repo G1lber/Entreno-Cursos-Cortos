@@ -7,7 +7,7 @@
 
 * pip install docxtpl
 
-* pip install pip install django-anymail[graph]
+* pip install django-anymail[graph]
 * pip install "django-anymail[microsoft]"
 
 

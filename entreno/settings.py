@@ -37,7 +37,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    "msgraphbackend",
+    "curso.msgraphbackend",
     "anymail",
     'curso'
 ]
@@ -81,7 +81,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.mysql',   # Driver MySQL
         'NAME': 'cursos_cortos',                      # Nombre de tu base de datos
         'USER': 'root',                        # Usuario de MySQL
-        'PASSWORD': 'root',             # Contraseña
+        'PASSWORD': '',             # Contraseña
         'HOST': '127.0.0.1',                   # Servidor (localhost)
         'PORT': '3306',                        # Puerto por defecto MySQL
         'OPTIONS': {

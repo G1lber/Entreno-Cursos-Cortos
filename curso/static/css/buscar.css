@@ -8,15 +8,22 @@
 }
 
 /* Botón volver */
-.back-link {
+.btn-back {
   display: inline-block;
-  margin-bottom: 10px;
-  color: #555;
-  font-size: 14px;
+  padding: 8px 14px;
+  background: transparent;
+  color: #0d0f0c;             /* azul */
+  border: 2px solid #246902;  /* borde azul */
+  border-radius: 6px;
   text-decoration: none;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.2s ease;
 }
-.back-link:hover {
-  color: #000;
+
+.btn-back:hover {
+  background: #246902;
+  color: white;
 }
 
 /* Encabezado con botón */
@@ -36,6 +43,7 @@
   cursor: pointer;
   margin-left: 20px; /* asegura que no quede pegado al h1 */
   font-size: 14px;
+  text-decoration: none;
 }
 .create:hover {
   background: #015081;

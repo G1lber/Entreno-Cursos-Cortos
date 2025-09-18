@@ -339,14 +339,22 @@ def inicioSesion(request):
         if form.is_valid():
             email = form.cleaned_data['email']
             password = form.cleaned_data['password']
-            # Aquí deberías autenticar al usuario con el email y password
+            # Autenticar al usuario con el email y password
             usuario = authenticate(request, email=email, password=password)
             if usuario is not None:
                 login(request, usuario)
                 messages.success(request, f"Inicio de sesión exitoso para {email}.")
+                
+                # Redirigir según el rol del usuario
                 if usuario.rol.nombre == "INSTRUCTOR":
-                    return redirect('dashboard')  # Redirige a la página principal u otra página
-                return redirect('viewUsuarios')  # Redirige a la página principal u otra página
+                    return redirect('dashboard')  # Dashboard para instructores
+                elif usuario.rol.nombre == "FUNCIONARIO":
+                    return redirect('dashboard')  # Panel de coordinación para funcionarios
+                elif usuario.rol.nombre == "Admin" or usuario.is_superuser:
+                    return redirect('viewUsuarios')  # Vista de administración para admins
+                else:
+                    # Redirección por defecto para otros roles no especificados
+                    return redirect('dashboard')
             else:
                 messages.error(request, "Credenciales inválidas.")
     else:

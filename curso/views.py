@@ -301,6 +301,11 @@ def curso_generado(request):
 
     curso = Curso.objects.select_related("programa").get(id=curso_id)
 
+    # 👇 Guardar la URL en el modelo si existe
+    if url_aspirantes:
+        curso.link = url_aspirantes
+        curso.save(update_fields=["link"])
+
     return render(request, "formularios/curso_generado.html", {
         "curso": curso,
         "url_aspirantes": url_aspirantes,

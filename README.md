@@ -11,7 +11,8 @@
 * pip install "django-anymail[microsoft]"
 
 * pip install pandas
-
+* pip install openpyxl
+* pip install pillow
 
 # Entreno-Cursos-Cortos
 ### SenaSoft

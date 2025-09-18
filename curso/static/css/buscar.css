@@ -36,6 +36,7 @@
   cursor: pointer;
   margin-left: 20px; /* asegura que no quede pegado al h1 */
   font-size: 14px;
+  text-decoration: none;
 }
 .create:hover {
   background: #015081;

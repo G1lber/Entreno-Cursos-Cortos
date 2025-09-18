@@ -230,7 +230,14 @@
   color: #721c24;
 }
 
-/* Botón solicitar */
+/* Contenedor de botones dentro de la celda */
+td form {
+  display: inline-block;
+  margin-right: 6px; /* separación entre botones */
+  margin-bottom: 5px;
+}
+
+/* Botón Solicitar */
 .btn-solicitar {
   background: #007bff;
   color: white;
@@ -243,4 +250,19 @@
 }
 .btn-solicitar:hover {
   background: #0056b3;
+}
+
+/* Botón Eliminar */
+.btn-eliminar {
+  background: #dc3545;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 13px;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+.btn-eliminar:hover {
+  background: #a71d2a;
 }

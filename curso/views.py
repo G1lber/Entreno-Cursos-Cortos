@@ -45,8 +45,14 @@ def buscar_curso(request):
         "courses": courses,
         "q": q
     })
-
-
+#Eliminar Curso
+def eliminar_curso(request, curso_id):
+    if request.method == "POST":
+        curso = get_object_or_404(Curso, id=curso_id)
+        curso.delete()
+        messages.success(request, f"El curso {curso.programa.nombre} fue eliminado correctamente.")
+    return redirect("buscar_curso")
+    
 #Coordinador
 def coordinador(request):
     solicitudes = Solucitud.objects.select_related("curso__programa", "curso__usuario")

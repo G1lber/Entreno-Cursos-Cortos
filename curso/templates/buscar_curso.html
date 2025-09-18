@@ -9,11 +9,11 @@
 
   <!-- Encabezado -->
   <div class="header-actions">
-    <h1>Buscar Cursos</h1>
-    <a class="create" href={% url 'generar_curso' %} >＋ Crear Curso</a>
+    <h1>Buscar Ofertas</h1>
+    <a class="create" href={% url 'generar_curso' %} >＋ Crear Oferta</a>
   </div>
 
-  <p class="subtitle">Explora todos los cursos disponibles en el sistema</p>
+  <p class="subtitle">Explora todos tus ofertas disponibles</p>
 
   <!-- Barra de búsqueda -->
   <form method="get" class="search-bar">
@@ -22,12 +22,12 @@
   </form>
 
   <!-- Resultados -->
-  <h2 class="results-title">Cursos Encontrados ({{ courses|length }})</h2>
+  <h2 class="results-title">Ofertas Encontrados ({{ courses|length }})</h2>
 
   {% if not q %}
     <div class="alert info">Realiza una búsqueda para ver los resultados aquí!!</div>
   {% elif not courses %}
-    <div class="alert error">No se encontraron cursos</div>
+    <div class="alert error">No se encontraron Ofertas</div>
   {% else %}
     <div class="table-container">
       <table class="results-table">
@@ -68,11 +68,18 @@
               <a href="{{ course.registrationLink }}" target="_blank">Link</a>
             </td>
             <td>
-              <form method="post" action="#">
+              <form method="post" action="#" style="display:inline;">
                 {% csrf_token %}
                 <button type="submit" class="btn-solicitar">Solicitar</button>
               </form>
+
+              <form method="post" action="{% url 'eliminar_curso' course.id %}" style="display:inline;">
+                {% csrf_token %}
+                <button type="submit" class="btn-eliminar">Eliminar</button>
+              </form>
             </td>
+
+
           </tr>
           {% endfor %}
         </tbody>

@@ -1,19 +1,14 @@
 {% extends "base_nav.html" %}
-
 {% load static %}
 
-{% block content %}
-<!DOCTYPE html>
-<html lang="es">
-<head>
-  <meta charset="UTF-8">
-  <title>Administración de Reportes</title>
+{% block extra_css %}
   <link rel="stylesheet" href="{% static 'css/styles.css' %}">
-</head>
-<body>
+{% endblock %}
+
+{% block content %}
   <div class="container">
-  <!-- Botón volver -->
-  <a href="{% url 'dashboard' %}" class="back-link">← Volver al Dashboard</a>
+    <!-- Botón volver -->
+    <a href="{% url 'dashboard' %}" class="back-link">← Volver al Dashboard</a>
 
     <div class="header">
       <h2>Administración de Reportes</h2>
@@ -22,60 +17,55 @@
 
     <!-- Iteración de cursos -->
     {% for course in courses %}
-    <div class="card">
-      <div class="card-header">
-        <div>
-          <h3 class="card-title">{{ course.program }}</h3>
-          <p class="card-subtitle">Instructor: {{ course.instructorName }}</p>
-        </div>
-        <div>
-          {% if course.isActive %}
-            <span class="badge badge-active">Activo</span>
-          {% else %}
-            <span class="badge badge-complete">Completo</span>
-          {% endif %}
-          {% if course.reportsGenerated %}
-            <span class="badge badge-reports">Reportes generados</span>
-          {% endif %}
-        </div>
-      </div>
-
-      <div class="info-grid">
-        <div>Inicio: {{ course.startDate|date:"d/m/Y" }}</div>
-        <div>{{ course.registrations }}/{{ course.maxRegistrations }} inscritos</div>
-        <div>{{ course.registrations }} registros</div>
-      </div>
-
-      <div><strong>Horario:</strong> {{ course.selectedDays|join:", " }} - {{ course.schedule }}</div>
-
-      <div class="report-section">
-        <p><strong>Generación de Reportes Excel</strong></p>
-        {% if course.registrations >= 25 %}
-          <p>Curso con cupo completo - Reportes disponibles</p>
-          <form method="post" action="{% url 'generate_reports' course.id %}">
-            {% csrf_token %}
-            <button class="button"> 
-              {% if course.reportsGenerated %} Regenerar Reportes {% else %} Generar Reportes {% endif %}
-            </button>
-          </form>
+      <div class="card">
+        <div class="card-header">
           <div>
-            <p><strong>Se generarán 2 archivos:</strong></p>
-            <p>• Reporte 1: Documento + tipo de población</p>
-            <p>• Reporte 2: Información completa</p>
+            <h3 class="card-title">{{ course.program }}</h3>
+            <p class="card-subtitle">Instructor: {{ course.instructorName }}</p>
           </div>
-        {% else %}
-          <p>Faltan {{ 25|add:"-course.registrations" }} inscripciones para generar reportes</p>
-          <button class="button button-disabled" disabled>Generar Reportes</button>
-        {% endif %}
+          <div>
+            {% if course.isActive %}
+              <span class="badge badge-active">Activo</span>
+            {% else %}
+              <span class="badge badge-complete">Completo</span>
+            {% endif %}
+          </div>
+        </div>
+
+        <div class="info-grid">
+          <div>Inicio: {{ course.startDate|date:"d/m/Y" }}</div>
+          <div>{{ course.registrations }}/{{ course.maxRegistrations }} inscritos</div>
+          <div>{{ course.registrations }} registros</div>
+        </div>
+
+        <div><strong>Horario:</strong> {{ course.selectedDays|join:", " }} - {{ course.schedule }}</div>
+
+        <div class="report-section">
+          <p><strong>Generación de Reportes Excel</strong></p>
+          {% if course.registrations >= 25 %}
+            <p>Curso con cupo completo - Reportes disponibles</p>
+            <form method="post" action="{% url 'generate_reports' course.id %}">
+              {% csrf_token %}
+              <button class="button"> 
+                {% if course.reportsGenerated %} Regenerar Reportes {% else %} Generar Reportes {% endif %}
+              </button>
+            </form>
+            <div>
+              <p><strong>Se generarán 2 archivos:</strong></p>
+              <p>• Reporte 1: Documento + tipo de población</p>
+              <p>• Reporte 2: Información completa</p>
+            </div>
+          {% else %}
+            <p>Faltan {{ 25|add:"-course.registrations" }} inscripciones para generar reportes</p>
+            <button class="button button-disabled" disabled>Generar Reportes</button>
+          {% endif %}
+        </div>
       </div>
-    </div>
     {% empty %}
-    <div class="card empty-state">
-      <h3>No hay cursos creados</h3>
-      <p>Crea cursos para poder generar reportes de inscripciones.</p>
-    </div>
+      <div class="card empty-state">
+        <h3>No hay cursos creados</h3>
+        <p>Crea cursos para poder generar reportes de inscripciones.</p>
+      </div>
     {% endfor %}
   </div>
-</body>
-</html>
 {% endblock %}

@@ -196,7 +196,7 @@ def inicioSesion(request):
                 login(request, usuario)
                 messages.success(request, f"Inicio de sesión exitoso para {email}.")
                 if usuario.rol.nombre == "INSTRUCTOR":
-                    return redirect('generar_curso')  # Redirige a la página principal u otra página
+                    return redirect('dashboard')  # Redirige a la página principal u otra página
                 return redirect('viewUsuarios')  # Redirige a la página principal u otra página
             else:
                 messages.error(request, "Credenciales inválidas.")

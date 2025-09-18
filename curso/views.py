@@ -1,6 +1,7 @@
 from django.shortcuts import redirect, get_object_or_404
 from .models import TipoDocumento, Rol, Usuario,Programa, Departamento, Municipio, Curso, Solucitud
-from .forms import UsuarioEditForm, UsuarioCreateForm, InicioSesionForm
+from .forms import UsuarioEditForm, UsuarioCreateForm, InicioSesionForm, CursoForm
+from django.urls import reverse
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
@@ -16,8 +17,7 @@ import pandas as pd
 from io import BytesIO
 import zipfile
 from datetime import datetime, timedelta
-from django.http import HttpResponse
-
+from openpyxl import load_workbook
 
 def dashboard(request):
     return render(request, 'dashboard.html')
@@ -91,109 +91,96 @@ def reject_request(request, pk):
     return redirect("coordinador")
 
 #Reportes
-# Datos de ejemplo para cursos (en memoria)
-EXAMPLE_COURSES = [
-    {
-        'id': 1,
-        'program': 'Programa de Formación Ejemplo 1',
-        'instructorName': 'Juan Pérez',
-        'isActive': True,
-        'reportsGenerated': False,
-        'startDate': datetime.now().date(),
-        'registrations': 25,
-        'maxRegistrations': 25,
-        'selectedDays': ['Lunes', 'Miércoles', 'Viernes'],
-        'schedule': '14:00 - 16:00'
-    },
-    {
-        'id': 2,
-        'program': 'Programa de Formación Ejemplo 2',
-        'instructorName': 'María García',
-        'isActive': True,
-        'reportsGenerated': True,
-        'startDate': (datetime.now() + timedelta(days=10)).date(),
-        'registrations': 20,
-        'maxRegistrations': 25,
-        'selectedDays': ['Martes', 'Jueves'],
-        'schedule': '16:00 - 18:00'
-    },
-    {
-        'id': 3,
-        'program': 'Programa de Formación Ejemplo 3',
-        'instructorName': 'Carlos Rodríguez',
-        'isActive': False,
-        'reportsGenerated': False,
-        'startDate': (datetime.now() - timedelta(days=15)).date(),
-        'registrations': 30,
-        'maxRegistrations': 25,
-        'selectedDays': ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes'],
-        'schedule': '09:00 - 12:00'
-    }
-]
-
 def reportes(request):
     cursos = Curso.objects.all().order_by('-fecha_inicio')
-    return render(request, 'reportes.html', {'courses': cursos})
+    return render(request, 'reportes.html', {'cursos': cursos})
 
 def generate_reports(request, course_id):
-    if request.method == 'POST':
+    if request.method == "POST":
         course = get_object_or_404(Curso, id=course_id)
-        
-        # Crear datos de ejemplo para los reportes (basados en tu segunda versión)
-        report1_data = [
-            ['CC', '12345678', 'Estudiante'],
-            ['CC', '87654321', 'Profesional'],
-            ['CC', '11223344', 'Estudiante'],
-            ['CC', '44332211', 'Profesional'],
-            ['CC', '55667788', 'Estudiante']
+
+        # Reporte 1 en plantilla XLSM
+        ruta_plantilla = os.path.join(
+            settings.BASE_DIR,
+            "curso", "templates", "docs", "Masivo 2024 MOISO.xlsm"
+        )
+
+        wb = load_workbook(ruta_plantilla, keep_vba=True)
+        ws = wb.active  # puedes usar ws = wb["Hoja1"] si tu hoja tiene nombre
+
+        # Traer aspirantes relacionados al curso
+        aspirantes = course.aspirante_set.all()  # FK Curso → Aspirante
+
+        fila = 5  # empieza a llenar desde fila 5
+        for asp in aspirantes:
+            ws[f"B{fila}"] = asp.tipo_documento.nombre if asp.tipo_documento else ""
+            ws[f"C{fila}"] = asp.documento
+            ws[f"D{fila}"] = getattr(asp, "tipo_poblacion", "Estudiante")  # ejemplo
+
+            # 🔹 Dejar F y G vacías
+            ws[f"F{fila}"] = ""
+            ws[f"G{fila}"] = ""
+
+            fila += 1
+
+        reporte1 = BytesIO()
+        wb.save(reporte1)
+        reporte1.seek(0)
+
+        #Reporte 2 con pandas
+        aspirantes_data = [
+            [
+                asp.tipo_documento.nombre if asp.tipo_documento else "",
+                asp.documento,
+                asp.first_name,
+                asp.last_name,
+                asp.email,
+                getattr(asp, "celular", ""),  # si tienes un campo teléfono
+                course.programa.nombre if course.programa else "",
+            ]
+            for asp in aspirantes
         ]
-        df1 = pd.DataFrame(report1_data, columns=['Tipo Documento', 'Documento', 'Tipo Población'])
-        
-        report2_data = [
-            ['CC', '12345678', 'Juan', 'Diaz', 'juan@email.com', '22222222', 'Estudiante'],
-            ['CC', '111111', 'Maria', 'Diaz', 'maria@email.com', '22222222', 'Profesional'],
-            ['CC', '111111', 'Gilber', 'Diaz', 'carlos@email.com', '22222222', 'Estudiante'],
-            ['CC', '11111', 'Daniel',  'Diaz', 'ana@email.com', '22222222', 'Profesional'],
-            ['CC', '1111', 'Fernanda', 'Diaz', 'luisa@email.com', '22222222', 'Estudiante']
-        ]
-        df2 = pd.DataFrame(report2_data, columns=['Tipo Documento', 'Documento', 'Nombre', 'Apellido', 'Email', 'Número', 'Programa'])
-        
-        # Crear archivo ZIP en memoria
+
+        df2 = pd.DataFrame(
+            aspirantes_data,
+            columns=[
+                "Tipo Documento",
+                "Documento",
+                "Nombre",
+                "Apellido",
+                "Email",
+                "Número",
+                "Programa",
+            ],
+        )
+
+        reporte2 = BytesIO()
+        df2.to_excel(reporte2, index=False)
+        reporte2.seek(0)
+
+        #Empaquetar ZIP
         buffer = BytesIO()
-        with zipfile.ZipFile(buffer, 'w') as zip_file:
-            # Guardar primer reporte
-            excel_file1 = BytesIO()
-            df1.to_excel(excel_file1, index=False)
-            zip_file.writestr(f'reporte1_{course.programa.nombre if course.programa else "curso"}.xlsx', excel_file1.getvalue())
-            
-            # Guardar segundo reporte
-            excel_file2 = BytesIO()
-            df2.to_excel(excel_file2, index=False)
-            zip_file.writestr(f'reporte2_{course.programa.nombre if course.programa else "curso"}.xlsx', excel_file2.getvalue())
-        
+        with zipfile.ZipFile(buffer, "w") as zip_file:
+            # Guardar reporte 1
+            zip_file.writestr(
+                f"reporte1_{course.programa.nombre if course.programa else 'curso'}.xlsm",
+                reporte1.getvalue(),
+            )
+            # Guardar reporte 2
+            zip_file.writestr(
+                f"reporte2_{course.programa.nombre if course.programa else 'curso'}.xlsx",
+                reporte2.getvalue(),
+            )
+
         buffer.seek(0)
-        
-        # Marcar curso como con reportes generados
-        course.reportes_generados = True
-        course.save()
-        
-        # Devolver el ZIP como respuesta
-        response = HttpResponse(buffer, content_type='application/zip')
-        response['Content-Disposition'] = f'attachment; filename="reportes_{course.programa.nombre if course.programa else "curso"}.zip"'
+
+        response = HttpResponse(buffer, content_type="application/zip")
+        response[
+            "Content-Disposition"
+        ] = f'attachment; filename=\"reportes_{course.programa.nombre if course.programa else 'curso'}.zip\"'
         return response
-    
-    return redirect('reportes')
 
-import os
-from django.conf import settings
-from django.http import HttpResponse
-from django.shortcuts import render
-from docxtpl import DocxTemplate
-from .forms import CursoForm
-from .models import Curso
-
-
-from django.urls import reverse
+    return redirect("reportes")
 
 def generar_curso(request):
     usuario = request.user  # Usuario autenticado
@@ -273,7 +260,6 @@ def generar_curso(request):
         form = CursoForm(usuario=usuario)
 
     return render(request, "formularios/formulario-formato.html", {"form": form})
-
 
 # Obtener datos del programa
 def get_programa(request, programa_id):

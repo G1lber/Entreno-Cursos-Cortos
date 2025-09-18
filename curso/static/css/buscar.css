@@ -19,11 +19,30 @@
   color: #000;
 }
 
-/* Títulos */
-h1 {
-  font-size: 24px;
-  margin-bottom: 5px;
+/* Encabezado con botón */
+.header-actions {
+  display: flex;
+  justify-content: space-between; /* separa título y botón */
+  align-items: center;            /* centra verticalmente */
+  margin-bottom: 10px;
 }
+
+.create {
+  padding: 8px 14px;
+  background: #002b46;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  margin-left: 20px; /* asegura que no quede pegado al h1 */
+  font-size: 14px;
+}
+.create:hover {
+  background: #015081;
+}
+
+/* Títulos */
+
 .subtitle {
   color: #666;
   margin-bottom: 20px;

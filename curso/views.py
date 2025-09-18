@@ -1,5 +1,5 @@
 from django.shortcuts import redirect, get_object_or_404
-from .models import TipoDocumento, Rol, Usuario,Programa, Departamento, Municipio, Curso
+from .models import TipoDocumento, Rol, Usuario,Programa, Departamento, Municipio, Curso, Solucitud
 from .forms import UsuarioEditForm, UsuarioCreateForm, InicioSesionForm
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
@@ -11,6 +11,7 @@ import io
 from django.conf import settings
 from django.shortcuts import render
 from docxtpl import DocxTemplate
+from django.db.models import Q, OuterRef, Subquery # Importar Q para búsquedas complejas
 import pandas as pd
 from io import BytesIO
 import zipfile
@@ -23,11 +24,71 @@ def dashboard(request):
 
 #Buscar Cursos
 def buscar_curso(request):
-    return render(request, 'buscar_curso.html')
+    q = request.GET.get("q", "").strip()
+    courses = []
+
+    if q:  # solo buscar si hay algo en q
+        # Subquery para traer el estado de la solicitud vinculada
+        estado_subquery = Solucitud.objects.filter(
+            curso=OuterRef("pk")
+        ).values("estado")[:1]
+
+        courses = Curso.objects.filter(
+            Q(programa__nombre__icontains=q) |
+            Q(usuario__first_name__icontains=q) |
+            Q(usuario__last_name__icontains=q) |
+            Q(usuario__documento__icontains=q)
+        ).annotate(
+            estado_solicitud=Subquery(estado_subquery)
+        )
+
+        # opcional: mapear el número a texto
+        estado_map = {0: "pending", 1: "approved", 2: "rejected"}
+        for c in courses:
+            c.status = estado_map.get(c.estado_solicitud, "pending")
+
+    return render(request, "buscar_curso.html", {
+        "courses": courses,
+        "q": q
+    })
 
 #Coordinador
 def coordinador(request):
-    return render(request, 'coordinador_dashboard.html')
+    solicitudes = Solucitud.objects.select_related("curso__programa", "curso__usuario")
+
+    # Creamos un diccionario de traducción
+    estado_map = {
+        0: "pending",
+        1: "approved",
+        2: "rejected",
+    }
+
+    # Agregamos un atributo extra a cada objeto
+    for s in solicitudes:
+        s.status = estado_map.get(s.estado, "unknown")
+
+    pending_courses = [s for s in solicitudes if s.estado == 0]
+    approved_courses = [s for s in solicitudes if s.estado == 1]
+    rejected_courses = [s for s in solicitudes if s.estado == 2]
+    return render(request, 'coordinador_dashboard.html',
+                  { "pending_courses": pending_courses,
+                    "approved_courses": approved_courses,
+                    "rejected_courses": rejected_courses,
+                    "courses": solicitudes,
+                    })
+    
+#Aprobar-Rechazar Solicitudes
+def approve_request(request, pk):
+    solicitud = get_object_or_404(Solucitud, pk=pk)
+    solicitud.estado = 1  # aprobado
+    solicitud.save()
+    return redirect("coordinador")  
+
+def reject_request(request, pk):
+    solicitud = get_object_or_404(Solucitud, pk=pk)
+    solicitud.estado = 2  # rechazado
+    solicitud.save()
+    return redirect("coordinador")
 
 #Reportes
 # Datos de ejemplo para cursos (en memoria)

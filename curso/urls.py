@@ -55,10 +55,18 @@ urlpatterns = [
     path("get-programa/<int:programa_id>/", views.get_programa, name="get_programa"),
     # Obtener municipios por departamento
     path("get-municipios/<int:departamento_id>/", views.get_municipios, name="get_municipios"),
+
+    
+    # aprobar - rechazar solicitudes
+    path("solicitud/<int:pk>/aprobar/", views.approve_request, name="approve_request"),
+    path("solicitud/<int:pk>/rechazar/", views.reject_request, name="reject_request"),
+    
+
     # Registrar aspirante a un curso
     path("curso/<int:curso_id>/aspirantes/", views.registrar_aspirante, name="registrar_aspirante"),
     # Página que muestra el ID del curso y la URL para registrar aspirantes
     path("curso-generado/", views.curso_generado, name="curso_generado"),
     # Descargar archivo Word generado
     path("curso/<int:curso_id>/descargar/", views.descargar_curso, name="descargar_curso"),
+
 ]

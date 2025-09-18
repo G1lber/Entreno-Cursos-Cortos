@@ -2,17 +2,35 @@ from django import forms
 from .models import Usuario, Programa, Departamento, Municipio
 
 class InicioSesionForm(forms.Form):
-    email = forms.EmailField(label="Correo electrónico")
-    password = forms.CharField(widget=forms.PasswordInput, label="Contraseña")
+    email = forms.EmailField(
+        label="Correo electrónico",
+        widget=forms.EmailInput(attrs={
+            "class": "form-control",
+            "placeholder": "Ingrese su correo"
+        })
+    )
+    password = forms.CharField(
+        label="Contraseña",
+        widget=forms.PasswordInput(attrs={
+            "class": "form-control",
+            "placeholder": "Ingrese su contraseña"
+        })
+    )
 
 
 class UsuarioCreateForm(forms.ModelForm):
     password = forms.CharField(
-        widget=forms.PasswordInput,
+        widget=forms.PasswordInput(attrs={
+            "class": "form-control",
+            "placeholder": "Ingrese su contraseña"
+        }),
         label="Contraseña"
     )
     confirm_password = forms.CharField(
-        widget=forms.PasswordInput,
+        widget=forms.PasswordInput(attrs={
+            "class": "form-control",
+            "placeholder": "Confirme su contraseña"
+        }),
         label="Confirmar contraseña"
     )
 
@@ -29,6 +47,33 @@ class UsuarioCreateForm(forms.ModelForm):
             "rol",
             "firma",
         ]
+        widgets = {
+            "first_name": forms.TextInput(attrs={
+                "class": "form-control",
+                "placeholder": "Ingrese su nombre"
+            }),
+            "last_name": forms.TextInput(attrs={
+                "class": "form-control",
+                "placeholder": "Ingrese su apellido"
+            }),
+            "email": forms.EmailInput(attrs={
+                "class": "form-control",
+                "placeholder": "Ingrese su correo"
+            }),
+            "documento": forms.TextInput(attrs={
+                "class": "form-control",
+                "placeholder": "Número de documento"
+            }),
+            "tipo_documento": forms.Select(attrs={
+                "class": "form-select"
+            }),
+            "rol": forms.Select(attrs={
+                "class": "form-select"
+            }),
+            "firma": forms.ClearableFileInput(attrs={
+                "class": "form-control"
+            }),
+        }
 
     def clean(self):
         cleaned_data = super().clean()
@@ -49,7 +94,10 @@ class UsuarioCreateForm(forms.ModelForm):
 
 class UsuarioEditForm(forms.ModelForm):
     password = forms.CharField(
-        widget=forms.PasswordInput,
+        widget=forms.PasswordInput(attrs={
+            "class": "form-control",
+            "placeholder": "Nueva contraseña"
+        }),
         required=False,
         label="Nueva contraseña",
         help_text="Deja en blanco si no deseas cambiarla."
@@ -67,10 +115,37 @@ class UsuarioEditForm(forms.ModelForm):
             "firma",
             "password",
         ]
+        widgets = {
+            "first_name": forms.TextInput(attrs={
+                "class": "form-control",
+                "placeholder": "Ingrese su nombre"
+            }),
+            "last_name": forms.TextInput(attrs={
+                "class": "form-control",
+                "placeholder": "Ingrese su apellido"
+            }),
+            "email": forms.EmailInput(attrs={
+                "class": "form-control",
+                "placeholder": "Ingrese su correo"
+            }),
+            "documento": forms.TextInput(attrs={
+                "class": "form-control"
+            }),
+            "tipo_documento": forms.Select(attrs={
+                "class": "form-select"
+            }),
+            "rol": forms.Select(attrs={
+                "class": "form-select"
+            }),
+            "firma": forms.ClearableFileInput(attrs={
+                "class": "form-control"
+            }),
+        }
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['documento'].disabled = True    
-        
+
     def save(self, commit=True):
         usuario = super().save(commit=False)
         password = self.cleaned_data.get("password")
@@ -79,7 +154,6 @@ class UsuarioEditForm(forms.ModelForm):
         if commit:
             usuario.save()
         return usuario
-    
 
 class CursoForm(forms.Form):
     nombreprograma = forms.ModelChoiceField(

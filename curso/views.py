@@ -1,5 +1,5 @@
 from django.shortcuts import redirect, get_object_or_404
-from .models import TipoDocumento, Rol, Usuario,Programa, Departamento, Municipio
+from .models import TipoDocumento, Rol, Usuario,Programa, Departamento, Municipio, Curso
 from .forms import UsuarioEditForm, UsuarioCreateForm, InicioSesionForm
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
@@ -11,13 +11,28 @@ import io
 from django.conf import settings
 from django.shortcuts import render
 from docxtpl import DocxTemplate
+from django.db.models import Q # Importar Q para búsquedas complejas
 
 def dashboard(request):
     return render(request, 'dashboard.html')
 
 #Buscar Cursos
 def buscar_curso(request):
-    return render(request, 'buscar_curso.html')
+    q = request.GET.get("q", "").strip()
+    courses = []
+
+    if q:  # solo buscar si hay algo en q
+        courses = Curso.objects.filter(
+            Q(programa__nombre__icontains=q) |
+            Q(usuario__first_name__icontains=q) |
+            Q(usuario__last_name__icontains=q) |
+            Q(usuario__email__icontains=q) |
+            Q(usuario__documento__icontains=q)
+        )
+    return render(request, 'buscar_curso.html', 
+                  {'courses': courses, 
+                   'q': q
+                   })
 
 #Coordinador
 def coordinador(request):

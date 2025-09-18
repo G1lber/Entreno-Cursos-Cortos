@@ -1,5 +1,5 @@
 from django.shortcuts import redirect, get_object_or_404
-from .models import TipoDocumento, Rol, Usuario,Programa, Departamento, Municipio
+from .models import TipoDocumento, Rol, Usuario,Programa, Departamento, Municipio, Curso
 from .forms import UsuarioEditForm, UsuarioCreateForm, InicioSesionForm
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
@@ -71,38 +71,31 @@ EXAMPLE_COURSES = [
 ]
 
 def reportes(request):
-    return render(request, 'reportes.html', {'courses': EXAMPLE_COURSES})
+    cursos = Curso.objects.all().order_by('-fecha_inicio')
+    return render(request, 'reportes.html', {'courses': cursos})
 
 def generate_reports(request, course_id):
     if request.method == 'POST':
-        # Buscar el curso en los datos de ejemplo
-        course = None
-        for c in EXAMPLE_COURSES:
-            if c['id'] == int(course_id):
-                course = c
-                break
+        course = get_object_or_404(Curso, id=course_id)
         
-        if not course:
-            return redirect('reportes')
-        
-        # Crear datos de ejemplo para los reportes
+        # Crear datos de ejemplo para los reportes (basados en tu segunda versión)
         report1_data = [
-            ['12345678', 'Estudiante'],
-            ['87654321', 'Profesional'],
-            ['11223344', 'Estudiante'],
-            ['44332211', 'Profesional'],
-            ['55667788', 'Estudiante']
+            ['CC', '12345678', 'Estudiante'],
+            ['CC', '87654321', 'Profesional'],
+            ['CC', '11223344', 'Estudiante'],
+            ['CC', '44332211', 'Profesional'],
+            ['CC', '55667788', 'Estudiante']
         ]
-        df1 = pd.DataFrame(report1_data, columns=['Documento', 'Tipo Población'])
+        df1 = pd.DataFrame(report1_data, columns=['Tipo Documento', 'Documento', 'Tipo Población'])
         
         report2_data = [
-            ['12345678', 'Juan', 'Pérez', 'juan@email.com', 'Estudiante', 'Ingeniería'],
-            ['87654321', 'María', 'Gómez', 'maria@email.com', 'Profesional', 'Medicina'],
-            ['11223344', 'Carlos', 'López', 'carlos@email.com', 'Estudiante', 'Derecho'],
-            ['44332211', 'Ana', 'Martínez', 'ana@email.com', 'Profesional', 'Arquitectura'],
-            ['55667788', 'Luisa', 'Rodríguez', 'luisa@email.com', 'Estudiante', 'Administración']
+            ['CC', '12345678', 'Juan', 'Diaz', 'juan@email.com', '22222222', 'Estudiante'],
+            ['CC', '111111', 'Maria', 'Diaz', 'maria@email.com', '22222222', 'Profesional'],
+            ['CC', '111111', 'Gilber', 'Diaz', 'carlos@email.com', '22222222', 'Estudiante'],
+            ['CC', '11111', 'Daniel',  'Diaz', 'ana@email.com', '22222222', 'Profesional'],
+            ['CC', '1111', 'Fernanda', 'Diaz', 'luisa@email.com', '22222222', 'Estudiante']
         ]
-        df2 = pd.DataFrame(report2_data, columns=['Documento', 'Nombre', 'Apellido', 'Email', 'Tipo Población', 'Programa'])
+        df2 = pd.DataFrame(report2_data, columns=['Tipo Documento', 'Documento', 'Nombre', 'Apellido', 'Email', 'Número', 'Programa'])
         
         # Crear archivo ZIP en memoria
         buffer = BytesIO()
@@ -110,24 +103,22 @@ def generate_reports(request, course_id):
             # Guardar primer reporte
             excel_file1 = BytesIO()
             df1.to_excel(excel_file1, index=False)
-            zip_file.writestr(f'reporte1_{course["program"]}.xlsx', excel_file1.getvalue())
+            zip_file.writestr(f'reporte1_{course.programa.nombre if course.programa else "curso"}.xlsx', excel_file1.getvalue())
             
             # Guardar segundo reporte
             excel_file2 = BytesIO()
             df2.to_excel(excel_file2, index=False)
-            zip_file.writestr(f'reporte2_{course["program"]}.xlsx', excel_file2.getvalue())
+            zip_file.writestr(f'reporte2_{course.programa.nombre if course.programa else "curso"}.xlsx', excel_file2.getvalue())
         
         buffer.seek(0)
         
-        # Marcar curso como con reportes generados (en memoria)
-        for c in EXAMPLE_COURSES:
-            if c['id'] == int(course_id):
-                c['reportsGenerated'] = True
-                break
+        # Marcar curso como con reportes generados
+        course.reportes_generados = True
+        course.save()
         
         # Devolver el ZIP como respuesta
         response = HttpResponse(buffer, content_type='application/zip')
-        response['Content-Disposition'] = f'attachment; filename="reportes_{course["program"]}.zip"'
+        response['Content-Disposition'] = f'attachment; filename="reportes_{course.programa.nombre if course.programa else "curso"}.zip"'
         return response
     
     return redirect('reportes')

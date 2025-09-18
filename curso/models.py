@@ -89,6 +89,7 @@ class Curso(models.Model):
     )
     fecha_inicio = models.DateTimeField()
     fecha_fin = models.DateTimeField()
+    max_inscripciones = models.IntegerField(default=25)
     estado = models.IntegerField(null=True, blank=True)
 
     def __str__(self):

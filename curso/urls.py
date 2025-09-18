@@ -46,6 +46,8 @@ urlpatterns = [
     path("buscar/", views.buscar_curso, name="buscar_curso"),
     path("coordinador/", views.coordinador, name="coordinador"),
     path("reportes/", views.reportes, name="reportes"),
+    path("generate_reports/<int:course_id>/", views.generate_reports, name="generate_reports"),
+
     
      # Generar curso
     path('generar_curso/', views.generar_curso, name='generar_curso'),

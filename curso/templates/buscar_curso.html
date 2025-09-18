@@ -21,7 +21,9 @@
   <!-- Lista de cursos -->
   <h2 class="results-title">Cursos Encontrados ({{ courses|length }})</h2>
 
-  {% if not courses %}
+  {% if not q %}
+    <div class="alert info">Realiza una busqueda para ver los resultados aqui!!</div>
+  {% elif not courses %}
     <div class="alert error">No se encontraron cursos</div>
   {% else %}
     <div class="courses-list">
@@ -30,7 +32,7 @@
           <div class="course-header">
             <div>
               <h3>{{ course.program }}</h3>
-              <p class="instructor">Instructor: {{ course.instructorName }}</p>
+              <p class="instructor">Programa: {{ course.programa.nombre }}</p>
               {% if course.description %}<p class="description">{{ course.description }}</p>{% endif %}
             </div>
             <div class="tags">
@@ -46,11 +48,12 @@
           </div>
 
           <div class="course-details">
-            <p>📅 Inicio: {{ course.startDate|date:"d/m/Y" }}</p>
-            <p>⏳ Duración: {{ course.duration }}</p>
-            <p>📍 {{ course.municipality }}</p>
-            <p>🏫 {{ course.modality }}</p>
-            <p>🕑 Horario: {{ course.days|join:", " }} - {{ course.schedule }}</p>
+              <p>📅 Inicio: {{ course.fecha_inicio|date:"d/m/Y" }}</p>
+              <p>📅 Fin: {{ course.fecha_fin|date:"d/m/Y" }}</p>
+              <p>⏳ Duración del programa: {{ course.programa.duracion }}</p>
+              <p>🏷️ Código del programa: {{ course.programa.codigo }}</p>
+              <p>👨‍🏫 Instructor: {{ course.usuario.first_name }} {{ course.usuario.last_name }}</p>
+              <p>📧 Contacto: {{ course.usuario.email }}</p>
           </div>
 
           <div class="course-footer">

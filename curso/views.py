@@ -26,7 +26,6 @@ def buscar_curso(request):
             Q(programa__nombre__icontains=q) |
             Q(usuario__first_name__icontains=q) |
             Q(usuario__last_name__icontains=q) |
-            Q(usuario__email__icontains=q) |
             Q(usuario__documento__icontains=q)
         )
     return render(request, 'buscar_curso.html', 

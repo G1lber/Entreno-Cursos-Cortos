@@ -10,6 +10,8 @@
 * pip install django-anymail[graph]
 * pip install "django-anymail[microsoft]"
 
+* pip install pandas
+
 
 # Entreno-Cursos-Cortos
 ### SenaSoft

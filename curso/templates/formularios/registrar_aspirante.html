@@ -8,9 +8,9 @@
 </head>
 <body>
   <h1>Registro de Aspirantes</h1>
-  <h3>Curso ID: {{ curso.id }} {{ curso.programa.nombre }}</h3>
+  <h3>Curso ID: {{ curso.id }} - {{ curso.programa.nombre }}</h3>
 
-  <form method="post">
+  <form method="post" enctype="multipart/form-data">
     {% csrf_token %}
     
     <div class="form-group">
@@ -31,6 +31,21 @@
     <div class="form-group">
       <label for="{{ form.telefono.id_for_label }}">Teléfono</label>
       {{ form.telefono }}
+    </div>
+
+    <div class="form-group">
+      <label for="{{ form.tipo_documento.id_for_label }}">Tipo de Documento</label>
+      {{ form.tipo_documento }}
+    </div>
+
+    <div class="form-group">
+      <label for="{{ form.poblacion.id_for_label }}">Población</label>
+      {{ form.poblacion }}
+    </div>
+
+    <div class="form-group">
+      <label for="{{ form.archivo_documento.id_for_label }}">Archivo Documento</label>
+      {{ form.archivo_documento }}
     </div>
 
     <button type="submit" class="button-primary">Registrar</button>

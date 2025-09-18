@@ -302,12 +302,16 @@ def registrar_aspirante(request, curso_id):
     curso = get_object_or_404(Curso, id=curso_id)
 
     if request.method == "POST":
-        form = AspiranteForm(request.POST)
+        form = AspiranteForm(request.POST, request.FILES)  # ✅ importante para archivos
         if form.is_valid():
             aspirante = form.save(commit=False)
-            aspirante.curso = curso
+            aspirante.curso = curso  # asignamos el curso de la URL
             aspirante.save()
-            return redirect("aspirante_exito")  # Puedes hacer que vaya a una página de éxito
+
+            messages.success(request, f"Aspirante {aspirante.nombre} registrado con éxito en el curso {curso.programa.nombre}.")
+            return redirect("registrar_aspirante", curso_id=curso.id)  # vuelve al mismo form
+        else:
+            messages.error(request, "Por favor corrige los errores en el formulario.")
     else:
         form = AspiranteForm()
 

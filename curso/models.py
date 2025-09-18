@@ -113,3 +113,38 @@ class Solucitud(models.Model):  # Ojo: en SQL está escrito "solucitud", no "sol
 
     def __str__(self):
         return f"Solucitud {self.id} - Curso {self.curso_id}"
+
+class Poblacion(models.Model):
+    nombre = models.CharField("Nombre", max_length=255, unique=True)
+
+    class Meta:
+        verbose_name = "Población"
+        verbose_name_plural = "Poblaciones"
+
+    def __str__(self):
+        return self.nombre
+    
+class Aspirante(models.Model):
+    nombre = models.CharField("Nombre", max_length=150)
+    correo = models.EmailField("Correo", max_length=150, unique=True)
+    telefono = models.CharField("Teléfono", max_length=20, blank=True, null=True)
+
+    poblacion = models.ForeignKey(
+        Poblacion, on_delete=models.SET_NULL, null=True, blank=True, related_name="aprendices"
+    )
+    tipo_documento = models.ForeignKey(
+        TipoDocumento, on_delete=models.SET_NULL, null=True, blank=True, related_name="aprendices"
+    )
+    curso = models.ForeignKey(
+        Curso, on_delete=models.CASCADE, related_name="aprendices"
+    )
+
+    documento = models.CharField("Documento", max_length=50, unique=True)
+    archivo_documento = models.FileField("Archivo Documento", upload_to="documentos/", blank=True, null=True)
+
+    class Meta:
+        verbose_name = "Aspirante"
+        verbose_name_plural = "Aspirantes"
+
+    def __str__(self):
+        return f"{self.nombre} ({self.documento})"

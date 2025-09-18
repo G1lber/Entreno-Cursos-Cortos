@@ -1,5 +1,5 @@
 from django import forms
-from .models import Usuario, Programa, Departamento, Municipio
+from .models import Usuario, Programa, Departamento, Municipio, Aspirante
 
 class InicioSesionForm(forms.Form):
     email = forms.EmailField(
@@ -270,3 +270,18 @@ class AspiranteForm(forms.Form):
         max_length=20,
         widget=forms.TextInput(attrs={"class": "form-control"})
     )
+
+class AspiranteForm(forms.ModelForm):
+    class Meta:
+        model = Aspirante
+        fields = ["nombre", "documento", "correo", "telefono", "poblacion", "tipo_documento", "archivo_documento"]
+
+        widgets = {
+            "nombre": forms.TextInput(attrs={"class": "form-control", "placeholder": "Nombre completo"}),
+            "documento": forms.TextInput(attrs={"class": "form-control", "placeholder": "Documento"}),
+            "correo": forms.EmailInput(attrs={"class": "form-control", "placeholder": "Correo electrónico"}),
+            "telefono": forms.TextInput(attrs={"class": "form-control", "placeholder": "Teléfono"}),
+            "poblacion": forms.Select(attrs={"class": "form-control"}),
+            "tipo_documento": forms.Select(attrs={"class": "form-control"}),
+            "archivo_documento": forms.ClearableFileInput(attrs={"class": "form-control"}),
+        }

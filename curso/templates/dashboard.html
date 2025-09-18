@@ -21,28 +21,6 @@
       <p class="text-muted">Gestiona cursos e inscripciones de manera eficiente</p>
     </div>
 
-    <!-- Estadísticas -->
-    <div class="row g-4 mb-4 justify-content-center align-items-stretch">
-      <div class="col-md-5 col-lg-4 d-flex">
-        <div class="card shadow-sm border-0 text-center w-100 h-100">
-          <div class="card-body d-flex flex-column justify-content-center">
-            <i class="bi bi-journal-text fs-1 text-primary"></i>
-            <h5 class="card-title mt-2">Cursos Activos</h5>
-            <h2 class="fw-bold text-primary">4</h2>
-          </div>
-        </div>
-      </div>
-      <div class="col-md-5 col-lg-4 d-flex">
-        <div class="card shadow-sm border-0 text-center w-100 h-100">
-          <div class="card-body d-flex flex-column justify-content-center">
-            <i class="bi bi-people fs-1 text-success"></i>
-            <h5 class="card-title mt-2">Inscripciones Totales</h5>
-            <h2 class="fw-bold text-success">0</h2>
-          </div>
-        </div>
-      </div>
-    </div>
-
     <!-- Acciones -->
     <div class="row g-4 mb-5 justify-content-center align-items-stretch">
       <div class="col-md-5 col-lg-4 d-flex">
@@ -63,7 +41,7 @@
               <h5 class="card-title">Enviar Solicitud</h5>
               <p class="text-muted">Envía una solicitud para crear un nuevo curso.</p>
             </div>
-            <a href="#" class="btn btn-success mt-3">Enviar Solicitud</a>
+            <a href="{% url 'generar_curso' %}" class="btn btn-success mt-3">Enviar Solicitud</a>
           </div>
         </div>
       </div>

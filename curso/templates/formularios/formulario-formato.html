@@ -8,7 +8,7 @@
   </head> 
   <body> 
       <h1>Formulario Curso</h1>
-        <form method="post">
+        <form method="post" enctype="multipart/form-data">
           {% csrf_token %}
 
           <!-- DATOS DEL PROGRAMA -->
@@ -96,10 +96,30 @@
               <label for="{{ form.programa_especial.id_for_label }}">Programa especial</label>
               {{ form.programa_especial }}
             </div>
-            <div class="form-group">
+           <div class="form-group">
               <label for="{{ form.empresa.id_for_label }}">Empresa solicitante</label>
               {{ form.empresa }}
             </div>
+
+            <div class="form-group" id="carta-empresa-wrapper" style="display: none;">
+              <label for="{{ form.carta_empresa.id_for_label }}">Carta de empresa</label>
+              {{ form.carta_empresa }}
+            </div>
+
+            <script>
+              document.addEventListener("DOMContentLoaded", function () {
+                const empresaInput = document.getElementById("{{ form.empresa.id_for_label }}");
+                const cartaWrapper = document.getElementById("carta-empresa-wrapper");
+
+                empresaInput.addEventListener("input", function () {
+                  if (this.value.trim() !== "") {
+                    cartaWrapper.style.display = "block";
+                  } else {
+                    cartaWrapper.style.display = "none";
+                  }
+                });
+              });
+            </script>
             <div class="form-row">
               <div class="form-group">
                 <label for="{{ form.fechainicio.id_for_label }}">Fecha inicio</label>
@@ -141,7 +161,7 @@
 
           <!-- BOTONES -->
           <div class="form-actions">
-            <button type="submit" class="button-primary">Generar Word</button>
+            <button type="submit" class="button-primary">Crear Curso</button>
             <button type="reset" class="button-outline">Cancelar</button>
           </div>
         </form>

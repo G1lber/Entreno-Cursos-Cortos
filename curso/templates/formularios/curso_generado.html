@@ -1,0 +1,18 @@
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Curso generado</title>
+ 
+</head>
+<body>
+    <h2>✅ Curso generado correctamente</h2>
+    <h3><strong>Curso:</strong> {{ curso.programa.nombre }}</h3>
+    <p><strong>ID:</strong> {{ curso.id }}</p>
+
+    <a href="{% url 'descargar_curso' curso.id %}" class="btn btn-primary">⬇️ Descargar archivo</a>
+    <br><br>
+    <a href="{{ url_aspirantes }}" class="btn btn-success">📝 Registrar aspirantes</a>
+    <!-- Script para descargar automáticamente -->
+   
+</body>
+</html>

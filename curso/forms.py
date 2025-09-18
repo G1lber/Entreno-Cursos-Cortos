@@ -113,6 +113,7 @@ class CursoForm(forms.Form):
     correo = forms.EmailField(label="Correo electrónico", disabled=True, required=False)
 
     empresa = forms.CharField(label="Empresa solicitante", max_length=200, required=False)
+    carta_empresa = forms.FileField(label="Carta de empresa", required=False)
 
     PROGRAMA_CHOICES = [
         ("SENA EMPREDE RURAL", "SENA EMPREDE RURAL"),
@@ -173,3 +174,26 @@ class CursoForm(forms.Form):
             self.fields["tipodoc"].initial = usuario.tipo_documento.nombre
             self.fields["numerodoc"].initial = usuario.documento
             self.fields["correo"].initial = usuario.email
+
+from django import forms
+
+class AspiranteForm(forms.Form):
+    nombre = forms.CharField(
+        label="Nombre completo",
+        max_length=200,
+        widget=forms.TextInput(attrs={"class": "form-control"})
+    )
+    documento = forms.CharField(
+        label="Número de documento",
+        max_length=50,
+        widget=forms.TextInput(attrs={"class": "form-control"})
+    )
+    correo = forms.EmailField(
+        label="Correo electrónico",
+        widget=forms.EmailInput(attrs={"class": "form-control"})
+    )
+    telefono = forms.CharField(
+        label="Teléfono de contacto",
+        max_length=20,
+        widget=forms.TextInput(attrs={"class": "form-control"})
+    )

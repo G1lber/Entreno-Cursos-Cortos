@@ -1,172 +1,225 @@
-{%load static%}
-
+{% load static %}
 <html lang="es"> 
   <head> 
     <meta charset="UTF-8"> 
     <title>Generar Oferta</title> 
     <link rel="stylesheet" href="{% static 'css/forms.css' %}">
+    <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.9/main.min.css" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.9/index.global.min.js"></script>
+
   </head> 
   <body> 
-      <h1>Formulario Oferta</h1>
-        <form method="post" enctype="multipart/form-data">
-          {% csrf_token %}
+    <h1>Formulario Curso</h1>
+    <form method="post" enctype="multipart/form-data">
+      {% csrf_token %}
+        {# mostrar errores generales y por campo #}
+      {% if form.non_field_errors %}
+        <div class="alert alert-danger">
+          <ul>
+            {% for err in form.non_field_errors %}
+              <li>{{ err }}</li>
+            {% endfor %}
+          </ul>
+        </div>
+      {% endif %}
 
-          <!-- DATOS DEL PROGRAMA -->
-          <div class="form-section">
-            <h2>Datos del programa</h2>
+      {% if form.errors %}
+        <div class="alert alert-warning">
+          <strong>Errores en el formulario:</strong>
+          <ul>
+          {% for field, errs in form.errors.items %}
+            <li><strong>{{ field }}:</strong>
+              <ul>
+              {% for e in errs %}
+                <li>{{ e }}</li>
+              {% endfor %}
+              </ul>
+            </li>
+          {% endfor %}
+          </ul>
+        </div>
+      {% endif %}
 
-            <div class="form-row">
-              <div class="form-group">
-                <label for="{{ form.nombreprograma.id_for_label }}">Nombre del programa</label>
-                {{ form.nombreprograma }}
-              </div>
-              <div class="form-group">
-                <label for="{{ form.codigoprograma.id_for_label }}">Código del programa</label>
-                {{ form.codigoprograma }}
-              </div>
-            </div>
-
-            <div class="form-row">
-              <div class="form-group">
-                <label for="{{ form.versionprograma.id_for_label }}">Versión</label>
-                {{ form.versionprograma }}
-              </div>
-
-              <div class="form-group">
-                <label for="{{ form.duracionprograma.id_for_label }}">Duración (Horas)</label>
-                {{ form.duracionprograma }}
-              </div>
-            </div>
+      <!-- DATOS DEL PROGRAMA -->
+      <div class="form-section">
+        <h2>Datos del programa</h2>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="{{ form.nombreprograma.id_for_label }}">Nombre del programa</label>
+            {{ form.nombreprograma }}
           </div>
-
-          <!-- RESPONSABLE -->
-          <div class="form-section">
-            <h2>Responsable</h2>
-
-            <div class="form-row">
-              <div class="form-group">
-                <label for="{{ form.nombre.id_for_label }}">Nombre responsable</label>
-                {{ form.nombre }}
-              </div>
-              <div class="form-group">
-                <label for="{{ form.tipodoc.id_for_label }}">Tipo documento</label>
-                {{ form.tipodoc }}
-              </div>
-            </div>
-
-            <div class="form-row">
-              <div class="form-group">
-                <label for="{{ form.numerodoc.id_for_label }}">Número de documento</label>
-                {{ form.numerodoc }}
-              </div>
-              <div class="form-group">
-                <label for="{{ form.correo.id_for_label }}">Correo electrónico</label>
-                {{ form.correo }}
-              </div>
-            </div>
+          <div class="form-group">
+            <label for="{{ form.codigoprograma.id_for_label }}">Código del programa</label>
+            {{ form.codigoprograma }}
           </div>
-
-          <!-- UBICACIÓN -->
-          <div class="form-section">
-            <h2>Ubicación</h2>
-
-            <div class="form-row">
-              <div class="form-group">
-                <label for="{{ form.departamento.id_for_label }}">Departamento</label>
-                {{ form.departamento }}
-              </div>
-
-              <div class="form-group">
-                <label for="{{ form.municipio.id_for_label }}">Municipio</label>
-                {{ form.municipio }}
-              </div>
-            </div>
-
-            <div class="form-group">
-              <label for="{{ form.direccion.id_for_label }}">Dirección</label>
-              {{ form.direccion }}
-            </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="{{ form.versionprograma.id_for_label }}">Versión</label>
+            {{ form.versionprograma }}
           </div>
-
-          <!-- DETALLES DEL CURSO -->
-          <div class="form-section">
-            <h2>Detalles del curso</h2>
-
-            <div class="form-group">
-              <label for="{{ form.programa_especial.id_for_label }}">Programa especial</label>
-              {{ form.programa_especial }}
-            </div>
-           <div class="form-group">
-              <label for="{{ form.empresa.id_for_label }}">Empresa solicitante</label>
-              {{ form.empresa }}
-            </div>
-
-            <div class="form-group" id="carta-empresa-wrapper" style="display: none;">
-              <label for="{{ form.carta_empresa.id_for_label }}">Carta de empresa</label>
-              {{ form.carta_empresa }}
-            </div>
-
-            <script>
-              document.addEventListener("DOMContentLoaded", function () {
-                const empresaInput = document.getElementById("{{ form.empresa.id_for_label }}");
-                const cartaWrapper = document.getElementById("carta-empresa-wrapper");
-
-                empresaInput.addEventListener("input", function () {
-                  if (this.value.trim() !== "") {
-                    cartaWrapper.style.display = "block";
-                  } else {
-                    cartaWrapper.style.display = "none";
-                  }
-                });
-              });
-            </script>
-            <div class="form-row">
-              <div class="form-group">
-                <label for="{{ form.fechainicio.id_for_label }}">Fecha inicio</label>
-                {{ form.fechainicio }}
-              </div>
-              <div class="form-group">
-                <label for="{{ form.fecha1.id_for_label }}">Fechas mes 1</label>
-                {{ form.fecha1 }}
-              </div>
-              
-            </div>
-            <div class="form-group">
-              <label>Días</label>
-              <div class="checkbox-group">
-                {{ form.dias }}
-              </div>
-            </div>
-
-              <div class="form-group">
-                <label for="{{ form.horario.id_for_label }}">Horario del curso</label>
-                {{ form.horario }}
-              </div>
-
-            <div class="form-row">
-              <div class="form-group">
-                <label for="{{ form.fecha2.id_for_label }}">Fechas mes 2</label>
-                {{ form.fecha2 }}
-              </div>
-              <div class="form-group">
-                <label for="{{ form.fechafin.id_for_label }}">Fecha fin</label>
-                {{ form.fechafin }}
-              </div>
-            </div>
-            <div class="form-group">
-                <label for="{{ form.firma.id_for_label }}">Firma instructor</label>
-                {{ form.firma }}
-              </div>
+          <div class="form-group">
+            <label for="{{ form.duracionprograma.id_for_label }}">Duración (Horas)</label>
+            {{ form.duracionprograma }}
           </div>
+        </div>
+      </div>
 
-          <!-- BOTONES -->
-          <div class="form-actions">
-            <button type="submit" class="button-primary">Crear Curso</button>
-            <button type="reset" class="button-outline">Cancelar</button>
+      <!-- RESPONSABLE -->
+      <div class="form-section">
+        <h2>Responsable</h2>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="{{ form.nombre.id_for_label }}">Nombre responsable</label>
+            {{ form.nombre }}
           </div>
-        </form>
+          <div class="form-group">
+            <label for="{{ form.tipodoc.id_for_label }}">Tipo documento</label>
+            {{ form.tipodoc }}
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="{{ form.numerodoc.id_for_label }}">Número de documento</label>
+            {{ form.numerodoc }}
+          </div>
+          <div class="form-group">
+            <label for="{{ form.correo.id_for_label }}">Correo electrónico</label>
+            {{ form.correo }}
+          </div>
+        </div>
+      </div>
 
-  <script src="{% static 'js/programa.js' %}"></script>
-  <script src="{% static 'js/departamento_municipio.js' %}"></script>
+      <!-- UBICACIÓN -->
+      <div class="form-section">
+        <h2>Ubicación</h2>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="{{ form.departamento.id_for_label }}">Departamento</label>
+            {{ form.departamento }}
+          </div>
+          <div class="form-group">
+            <label for="{{ form.municipio.id_for_label }}">Municipio</label>
+            {{ form.municipio }}
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="{{ form.direccion.id_for_label }}">Dirección</label>
+          {{ form.direccion }}
+        </div>
+      </div>
+
+      <!-- DETALLES DEL CURSO -->
+      <div class="form-section">
+        <h2>Detalles del curso</h2>
+
+        <div class="form-group">
+          <label for="{{ form.programa_especial.id_for_label }}">Programa especial</label>
+          {{ form.programa_especial }}
+        </div>
+        <div class="form-group">
+          <label for="{{ form.empresa.id_for_label }}">Empresa solicitante</label>
+          {{ form.empresa }}
+        </div>
+        <div class="form-group" id="carta-empresa-wrapper" style="display: none;">
+          <label for="{{ form.carta_empresa.id_for_label }}">Carta de empresa</label>
+          {{ form.carta_empresa }}
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="{{ form.fechainicio.id_for_label }}">Fecha inicio</label>
+            {{ form.fechainicio }}
+          </div>
+          <div class="form-group">
+            <label for="{{ form.fecha1.id_for_label }}">Fechas mes 1</label>
+            {{ form.fecha1 }}
+          </div>
+        </div>
+
+        <!-- DÍAS Y HORARIOS -->
+        <div class="form-group">
+          <label>Días</label>
+          <div class="checkbox-group">
+            {{ form.dias }}
+          </div>
+          <div id="horarios-dias"></div>
+        </div>
+
+        <!-- Selector tipo horario -->
+        <div class="form-group">
+          {{ form.tipo_horario }}
+        </div>
+
+        <!-- Horario general -->
+        <div class="form-row" id="horario-general">
+          <div class="form-group">
+            <label for="{{ form.horario_inicio.id_for_label }}">Hora inicio</label>
+            {{ form.horario_inicio }}
+          </div>
+          <div class="form-group">
+            <label for="{{ form.horario_fin.id_for_label }}">Hora fin</label>
+            {{ form.horario_fin }}
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="{{ form.fecha2.id_for_label }}">Fechas mes 2</label>
+            {{ form.fecha2 }}
+          </div>
+          <div class="form-group">
+            <label for="{{ form.fechafin.id_for_label }}">Fecha fin</label>
+            {{ form.fechafin }}
+          </div>
+        </div>
+      <div class="form-group">
+        <label for="{{ form.firma.id_for_label }}">Firma instructor</label>
+        {% if usuario.firma_digital %}
+            <div class="mb-3">
+                <img src="{{ usuario.firma_digital.url }}" 
+                    alt="Firma del instructor" 
+                    style="max-height:100px;">
+            </div>
+        {% else %}
+            <p>No hay firma registrada.</p>
+        {% endif %}
+        {# campo oculto para mantener compatibilidad con el form #}
+        <input type="hidden" name="firma" value="{{ usuario.firma_digital }}">
+      </div>
+      <!-- BOTONES -->
+      <div class="form-actions">
+        <button type="submit" class="button-primary">Crear Curso</button>
+        <button type="reset" class="button-outline">Cancelar</button>
+      </div>
+    </form>
+
+    <div id="calendar"></div>
+
+    <!-- FullCalendar -->
+    <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.9/index.global.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.9/index.global.min.js"></script>
+
+    <!-- Scripts propios -->
+    <script src="{% static 'js/programa.js' %}"></script>
+    <script src="{% static 'js/departamento_municipio.js' %}"></script>
+    <script src="{% static 'js/fechas.js' %}"></script>
+    <script>
+    document.addEventListener("DOMContentLoaded", function () {
+    const empresaInput = document.getElementById("id_empresa");
+    const cartaWrapper = document.getElementById("carta-empresa-wrapper");
+
+    if (empresaInput && cartaWrapper) {
+      // inicializar estado
+      cartaWrapper.style.display = empresaInput.value.trim() !== "" ? "block" : "none";
+
+      empresaInput.addEventListener("input", function () {
+        cartaWrapper.style.display = this.value.trim() !== "" ? "block" : "none";
+      });
+    }
+  });
+  </script>
+
   </body> 
 </html>
+

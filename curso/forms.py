@@ -205,40 +205,80 @@ class UsuarioEditForm(forms.ModelForm):
             usuario.save()
         return usuario
 
+from django import forms
+from .models import Programa, Departamento, Municipio
+
+
+from django import forms
+from .models import Programa, Departamento, Municipio
+
 class CursoForm(forms.Form):
+    # ---------- PROGRAMA ----------
     nombreprograma = forms.ModelChoiceField(
         queryset=Programa.objects.all(),
         label="Nombre del programa",
         widget=forms.Select(attrs={"class": "form-control"})
     )
-    codigoprograma = forms.CharField(label="Código del programa", max_length=50, widget=forms.TextInput(attrs={"readonly": "readonly"}))
-    versionprograma = forms.CharField(label="Versión del programa", max_length=20, widget=forms.TextInput(attrs={"readonly": "readonly"}))
-    duracionprograma = forms.CharField(label="Duración (Horas)", max_length=50, widget=forms.TextInput(attrs={"readonly": "readonly"}))
-    fechainicio = forms.DateField(label="Fecha de inicio", widget=forms.DateInput(attrs={'type': 'date'}))
-    fechafin = forms.DateField(label="Fecha de finalización", widget=forms.DateInput(attrs={'type': 'date'}))
+    codigoprograma = forms.CharField(
+        label="Código del programa",
+        max_length=50,
+        widget=forms.TextInput(attrs={"readonly": "readonly", "class": "form-control"})
+    )
+    versionprograma = forms.CharField(
+        label="Versión del programa",
+        max_length=20,
+        widget=forms.TextInput(attrs={"readonly": "readonly", "class": "form-control"})
+    )
+    duracionprograma = forms.CharField(
+        label="Duración (Horas)",
+        max_length=50,
+        widget=forms.TextInput(attrs={"readonly": "readonly", "class": "form-control"})
+    )
 
+    # ---------- FECHAS ----------
+    fechainicio = forms.DateField(
+        label="Fecha de inicio",
+        widget=forms.DateInput(attrs={'type': 'date', "class": "form-control"})
+    )
+    fechafin = forms.DateField(
+        label="Fecha de finalización",
+        required=False,
+        widget=forms.DateInput(attrs={'type': 'date', "class": "form-control", "readonly": "readonly"})
+    )
+
+    # ---------- UBICACIÓN ----------
     departamento = forms.ModelChoiceField(
         queryset=Departamento.objects.all(),
         label="Departamento",
-        empty_label="Seleccione un departamento"
+        empty_label="Seleccione un departamento",
+        widget=forms.Select(attrs={"class": "form-control"})
     )
     municipio = forms.ModelChoiceField(
-        queryset=Municipio.objects.none(),   # se llena dinámicamente
+        queryset=Municipio.objects.none(),
         label="Municipio",
-        empty_label="Seleccione un municipio"
+        empty_label="Seleccione un municipio",
+        widget=forms.Select(attrs={"class": "form-control"})
     )
+    direccion = forms.CharField(label="Dirección", max_length=200,
+                                widget=forms.TextInput(attrs={"class": "form-control"}))
 
-    direccion = forms.CharField(label="Dirección", max_length=200)
+    # ---------- RESPONSABLE (usuario logueado) ----------
+    nombre = forms.CharField(label="Nombre responsable", max_length=200, disabled=True, required=False,
+                             widget=forms.TextInput(attrs={"class": "form-control"}))
+    tipodoc = forms.CharField(label="Tipo documento", disabled=True, required=False,
+                              widget=forms.TextInput(attrs={"class": "form-control"}))
+    numerodoc = forms.CharField(label="Número de documento", max_length=50, disabled=True, required=False,
+                                widget=forms.TextInput(attrs={"class": "form-control"}))
+    correo = forms.EmailField(label="Correo electrónico", disabled=True, required=False,
+                              widget=forms.EmailInput(attrs={"class": "form-control"}))
 
-    # Datos del usuario (solo lectura, no requeridos porque no se envían en POST)
-    nombre = forms.CharField(label="Nombre responsable", max_length=200, disabled=True, required=False)
-    tipodoc = forms.CharField(label="Tipo documento", disabled=True, required=False)
-    numerodoc = forms.CharField(label="Número de documento", max_length=50, disabled=True, required=False)
-    correo = forms.EmailField(label="Correo electrónico", disabled=True, required=False)
+    # ---------- EMPRESA ----------
+    empresa = forms.CharField(label="Empresa solicitante", max_length=200, required=False,
+                              widget=forms.TextInput(attrs={"class": "form-control", "id": "id_empresa"}))
+    carta_empresa = forms.FileField(label="Carta de empresa", required=False,
+                                    widget=forms.ClearableFileInput(attrs={"class": "form-control"}))
 
-    empresa = forms.CharField(label="Empresa solicitante", max_length=200, required=False)
-    carta_empresa = forms.FileField(label="Carta de empresa", required=False)
-
+    # ---------- PROGRAMAS ESPECIALES ----------
     PROGRAMA_CHOICES = [
         ("SENA EMPREDE RURAL", "SENA EMPREDE RURAL"),
         ("SENA EMPRENDE RURAL- POST CONFLICTO (ETCR)", "SENA EMPRENDE RURAL- POST CONFLICTO (ETCR)"),
@@ -256,8 +296,9 @@ class CursoForm(forms.Form):
         ("ALIANZAS ESTRATEGICAS", "ALIANZAS ESTRATÉGICAS"),
         ("ALTA GERENCIA", "ALTA GERENCIA"),
     ]
-    programa_especial = forms.ChoiceField(choices=PROGRAMA_CHOICES, label="Programa Especial")
+    programa_especial = forms.ChoiceField(choices=PROGRAMA_CHOICES, label="Programa Especial", required=False)
 
+    # ---------- HORARIOS ----------
     DIAS_CHOICES = [
         ("LUN", "Lunes"),
         ("MAR", "Martes"),
@@ -273,11 +314,49 @@ class CursoForm(forms.Form):
         label="Días de la semana"
     )
 
-    horario = forms.CharField(label="Horario del curso", max_length=100)
-    fecha1 = forms.CharField(label="Fechas de ejecución (mes 1)", max_length=200)
-    fecha2 = forms.CharField(label="Fechas de ejecución (mes 2)", max_length=200, required=False)
-    firma = forms.CharField(label="Firma instructor", required=False)
+    TIPO_HORARIO_CHOICES = [
+        ("general", "Horario general"),
+        ("individual", "Horario por día"),
+    ]
+    tipo_horario = forms.ChoiceField(
+        choices=TIPO_HORARIO_CHOICES,
+        widget=forms.RadioSelect,
+        initial="general",
+        label="Tipo de horario"
+    )
 
+    horario_inicio = forms.TimeField(
+        label="Hora inicio",
+        required=False,
+        widget=forms.TimeInput(attrs={'type': 'time', 'class': 'form-control', 'id': 'id_horario_inicio'})
+    )
+    horario_fin = forms.TimeField(
+        label="Hora fin",
+        required=False,
+        widget=forms.TimeInput(attrs={'type': 'time', 'class': 'form-control', 'id': 'id_horario_fin'})
+    )
+
+    # ---------- SALIDA DE FECHAS ----------
+    fecha1 = forms.CharField(
+        label="Fechas de ejecución (mes 1)",
+        required=False,
+        max_length=1000,
+        widget=forms.Textarea(attrs={"class": "form-control", "readonly": "readonly"})
+    )
+    fecha2 = forms.CharField(
+        label="Fechas de ejecución (mes 2)",
+        required=False,
+        max_length=1000,
+        widget=forms.Textarea(attrs={"class": "form-control", "readonly": "readonly"})
+    )
+
+    # ---------- FIRMA ----------
+    firma = forms.FileField(
+            label="Firma instructor",
+            required=False,
+            widget=forms.ClearableFileInput(attrs={"class": "form-control d-none hidden "})  # oculto en el form
+        )
+    # ---------- INIT ----------
     def __init__(self, *args, **kwargs):
         usuario = kwargs.pop("usuario", None)
         super().__init__(*args, **kwargs)
@@ -295,10 +374,13 @@ class CursoForm(forms.Form):
         # Prellenar datos del usuario autenticado
         if usuario:
             self.fields["nombre"].initial = f"{usuario.first_name} {usuario.last_name}".strip()
-            self.fields["tipodoc"].initial = usuario.tipo_documento.nombre
-            self.fields["numerodoc"].initial = usuario.documento
+            if getattr(usuario, "tipo_documento", None):
+                self.fields["tipodoc"].initial = getattr(usuario.tipo_documento, "nombre", "")
+            self.fields["numerodoc"].initial = getattr(usuario, "documento", "")
             self.fields["correo"].initial = usuario.email
-
+            if usuario.firma_digital:
+                self.fields["firma"].initial = usuario.firma_digital
+from django import forms
 
 class AspiranteForm(forms.Form):
     nombre = forms.CharField(

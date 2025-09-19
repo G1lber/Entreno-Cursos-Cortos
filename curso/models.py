@@ -22,11 +22,18 @@ class Municipio(models.Model):
     def __str__(self):
         return self.nombre or ""
 
+class Area(models.Model):
+    nombre = models.CharField(max_length=100, unique=True)
+
+    def __str__(self):
+        return self.nombre
+
 class Programa(models.Model):
     codigo = models.IntegerField(unique=True, null=True, blank=True)
     duracion = models.CharField(max_length=50, null=True, blank=True)
     nombre = models.CharField(max_length=50, null=True, blank=True)
     version = models.CharField(max_length=2, null=True, blank=True)
+    area = models.ForeignKey(Area, on_delete=models.SET_NULL, null=True, blank=True)
 
     def __str__(self):
         return self.nombre or ""

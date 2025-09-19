@@ -249,7 +249,6 @@ class CursoForm(forms.Form):
             self.fields["numerodoc"].initial = usuario.documento
             self.fields["correo"].initial = usuario.email
 
-from django import forms
 
 class AspiranteForm(forms.Form):
     nombre = forms.CharField(

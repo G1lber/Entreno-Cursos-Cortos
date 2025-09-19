@@ -15,37 +15,30 @@
       <p class="text-muted">Gestiona cursos e inscripciones de manera eficiente</p>
     </div>
 
-    <!-- Acciones -->
+    <!-- Acciones para INSTRUCTOR y Admin -->
+    {% if user.rol.nombre == 'INSTRUCTOR' or user.rol.nombre == 'Admin' or user.is_superuser %}
     <div class="row g-4 mb-5 justify-content-center align-items-stretch">
       <div class="col-md-5 col-lg-4 d-flex">
         <div class="card shadow-sm border border-success text-center w-100 h-100">
           <div class="card-body d-flex flex-column justify-content-between">
             <div>
-              <h5 class="card-title">Buscar Cursos</h5>
-              <p class="text-muted">Explora y busca cursos disponibles en el sistema.</p>
+              <h5 class="card-title">Ofertas</h5>
+              <p class="text-muted">Crea y explora ofertas disponibles en el sistema.</p>
             </div>
-            <a href="{% url "buscar_curso" %}" class="btn btn-success mt-3 w-100">Buscar Cursos</a>
-          </div>
-        </div>
-      </div>
-      <div class="col-md-5 col-lg-4 d-flex">
-        <div class="card shadow-sm border border-success text-center w-100 h-100">
-          <div class="card-body d-flex flex-column justify-content-between">
-            <div>
-              <h5 class="card-title">Enviar Solicitud</h5>
-              <p class="text-muted">Envía una solicitud para crear un nuevo curso.</p>
-            </div>
-
-            <a href="{% url 'generar_curso' %}" class="btn btn-success mt-3 w-100">Enviar Solicitud</a>
-
+            <a href="{% url "buscar_curso" %}" class="btn btn-success mt-3 w-100">Ofertas</a>
           </div>
         </div>
       </div>
     </div>
+    {% endif %}
 
     <!-- Administración -->
+    {% if user.rol.nombre == 'INSTRUCTOR' or user.rol.nombre == 'FUNCIONARIO' or user.rol.nombre == 'Admin' or user.is_superuser %}
     <h4 class="mb-3 text-center">Administración</h4>
     <div class="row g-4 justify-content-center align-items-stretch">
+      
+      <!-- Panel de Coordinación (FUNCIONARIO y Admin) -->
+      {% if user.rol.nombre == 'FUNCIONARIO' or user.rol.nombre == 'Admin' or user.is_superuser %}
       <div class="col-md-5 col-lg-4 d-flex">
         <div class="card shadow-sm border border-success w-100 h-100">
           <div class="card-body text-center d-flex flex-column justify-content-between">
@@ -57,6 +50,10 @@
           </div>
         </div>
       </div>
+      {% endif %}
+      
+      <!-- Reportes Excel (INSTRUCTOR y Admin) -->
+      {% if user.rol.nombre == 'INSTRUCTOR' or user.rol.nombre == 'Admin' or user.is_superuser %}
       <div class="col-md-5 col-lg-4 d-flex">
         <div class="card shadow-sm border border-success w-100 h-100">
           <div class="card-body text-center d-flex flex-column justify-content-between">
@@ -64,13 +61,13 @@
               <h5 class="card-title">Reportes Excel</h5>
               <p class="text-muted">Genera y descarga reportes de inscripciones.</p>
             </div>
-
             <a href="{% url "reportes" %}" class="btn btn-success w-100 mt-3">Reportes Excel</a>
-
           </div>
         </div>
       </div>
+      {% endif %}
     </div>
+    {% endif %}
 
   </div>
 

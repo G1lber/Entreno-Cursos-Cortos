@@ -2,17 +2,107 @@
 <head>
   <meta charset="UTF-8">
   <title>Curso generado</title>
- 
+  <style>
+    body {
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      background: #f4f6f9;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+
+    .container {
+      background: #fff;
+      padding: 30px 40px;
+      border-radius: 12px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+      text-align: center;
+      max-width: 500px;
+      width: 90%;
+    }
+
+    h2 {
+      color: #28a745;
+      font-size: 1.8rem;
+      margin-bottom: 15px;
+    }
+
+    h3 {
+      font-size: 1.3rem;
+      margin-bottom: 10px;
+      color: #333;
+    }
+
+    p {
+      font-size: 1rem;
+      color: #555;
+      margin-bottom: 25px;
+    }
+
+    a.btn {
+      display: inline-block;
+      padding: 12px 20px;
+      margin: 8px;
+      border-radius: 8px;
+      text-decoration: none;
+      font-size: 1rem;
+      font-weight: 600;
+      transition: all 0.3s ease;
+    }
+
+    .btn-primary {
+      background: #007bff;
+      color: white;
+    }
+    .btn-primary:hover {
+      background: #0056b3;
+    }
+
+    .btn-success {
+      background: #28a745;
+      color: white;
+    }
+    .btn-success:hover {
+      background: #1e7e34;
+    }
+
+    /* Botón volver en la esquina superior izquierda */
+    .btn-back {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      padding: 8px 14px;
+      background: transparent;
+      color: #0d0f0c;
+      border: 2px solid #246902;
+      border-radius: 6px;
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 500;
+      transition: all 0.2s ease;
+    }
+
+    .btn-back:hover {
+      background: #246902;
+      color: white;
+    }
+  </style>
 </head>
 <body>
+
+  <!-- Botón volver -->
+  <a href="{% url 'buscar_curso' %}" class="btn-back">← Volver</a>
+
+  <div class="container">
     <h2>✅ Curso generado correctamente</h2>
     <h3><strong>Curso:</strong> {{ curso.programa.nombre }}</h3>
     <p><strong>ID:</strong> {{ curso.id }}</p>
 
     <a href="{% url 'descargar_curso' curso.id %}" class="btn btn-primary">⬇️ Descargar archivo</a>
-    <br><br>
     <a href="{{ url_aspirantes }}" class="btn btn-success">📝 Registrar aspirantes</a>
-    <!-- Script para descargar automáticamente -->
-   
+  </div>
 </body>
 </html>

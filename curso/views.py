@@ -191,11 +191,28 @@ def generate_reports(request, course_id):
 
     return redirect("reportes")
 # Generar curso y documento
+import os
+from django.conf import settings
+from django.shortcuts import render, redirect
+from django.http import HttpResponse
+from django.urls import reverse
+from docxtpl import DocxTemplate, InlineImage
+from docx.shared import Mm
+from .forms import CursoForm
+from .models import Curso
+from docxtpl import DocxTemplate, InlineImage
+from docx.shared import Mm
+import os
+from django.shortcuts import render, redirect
+from django.http import HttpResponse
+from django.urls import reverse
+from django.conf import settings
+
 def generar_curso(request):
     usuario = request.user  # Usuario autenticado
 
     if request.method == "POST":
-        form = CursoForm(request.POST, request.FILES, usuario=usuario)  # ✅ siempre paso usuario
+        form = CursoForm(request.POST, request.FILES, usuario=usuario)
         if form.is_valid():
             try:
                 # ✅ Crear curso en BD
@@ -212,9 +229,6 @@ def generar_curso(request):
 
                 # ✅ Preparar horario
                 tipo_horario = request.POST.get("tipo_horario", "general")
-                hora_inicio = form.cleaned_data.get("horario_inicio")
-                hora_fin = form.cleaned_data.get("horario_fin")
-
                 if tipo_horario == "general":
                     hora_inicio = form.cleaned_data.get("horario_inicio")
                     hora_fin = form.cleaned_data.get("horario_fin")
@@ -245,7 +259,7 @@ def generar_curso(request):
                     "horario": horario_texto,
                 })
 
-                # ✅ Generar documento
+                # ✅ Generar documento Word
                 ruta_base = os.path.join(settings.BASE_DIR, "curso", "templates", "docs")
                 ruta_plantilla = os.path.join(ruta_base, "plantilla-curso.docx")
                 if not os.path.exists(ruta_plantilla):
@@ -254,9 +268,20 @@ def generar_curso(request):
                 ruta_curso = os.path.join(ruta_base, str(curso.id))
                 os.makedirs(ruta_curso, exist_ok=True)
 
-                doc = DocxTemplate(ruta_plantilla)
-                doc.render(contexto)
+                doc = DocxTemplate(ruta_plantilla)  # 👈 se crea una sola vez
 
+                # ✅ Agregar firma como imagen si existe
+                if usuario.firma_digital:
+                    contexto["firma"] = InlineImage(
+                        doc,
+                        usuario.firma_digital.path,
+                        width=Mm(40)
+                    )
+                else:
+                    contexto["firma"] = ""
+
+                # Renderizar y guardar
+                doc.render(contexto)
                 nombre_docx = f"curso_{curso.id}.docx"
                 ruta_docx = os.path.join(ruta_curso, nombre_docx)
                 doc.save(ruta_docx)
@@ -271,6 +296,7 @@ def generar_curso(request):
                             destino.write(chunk)
                     curso.carta = f"docs/{curso.id}/{nombre_carta}"
 
+                # Guardar ruta del documento en el curso
                 curso.caracterizacion = f"docs/{curso.id}/{nombre_docx}"
                 curso.save(update_fields=["caracterizacion", "carta"])
 
@@ -290,9 +316,13 @@ def generar_curso(request):
                 return HttpResponse(f"Error generando el documento: {e}", status=500)
 
     else:
-        form = CursoForm(usuario=usuario)  # ✅ también en GET
+        form = CursoForm(usuario=usuario)
 
-    return render(request, "formularios/formulario-formato.html", {"form": form , "usuario": request.user})
+    return render(
+        request,
+        "formularios/formulario-formato.html",
+        {"form": form, "usuario": request.user}
+    )
 
 # Obtener datos del programa
 def get_programa(request, programa_id):

@@ -38,11 +38,21 @@ from .models import Curso
 
 from django.urls import reverse
 
+import os
+from django.conf import settings
+from django.http import HttpResponse
+from django.shortcuts import render, redirect
+from django.urls import reverse
+from docxtpl import DocxTemplate
+
+from .forms import CursoForm
+from .models import Curso
+
 def generar_curso(request):
     usuario = request.user  # Usuario autenticado
 
     if request.method == "POST":
-        form = CursoForm(request.POST, request.FILES, usuario=usuario)
+        form = CursoForm(request.POST, request.FILES, usuario=usuario)  # ✅ siempre paso usuario
         if form.is_valid():
             try:
                 # ✅ Crear curso en BD
@@ -57,7 +67,31 @@ def generar_curso(request):
                     fecha_fin=fecha_fin,
                 )
 
-                # ✅ Preparar documento
+                # ✅ Preparar horario
+                tipo_horario = request.POST.get("tipo_horario", "general")
+                hora_inicio = form.cleaned_data.get("horario_inicio")
+                hora_fin = form.cleaned_data.get("horario_fin")
+
+                if tipo_horario == "general":
+                    hora_inicio = form.cleaned_data.get("horario_inicio")
+                    hora_fin = form.cleaned_data.get("horario_fin")
+                    horario_texto = (
+                        f"{hora_inicio.strftime('%H:%M')} - {hora_fin.strftime('%H:%M')}"
+                        if hora_inicio and hora_fin else ""
+                    )
+                elif tipo_horario == "individual":
+                    dias = form.cleaned_data.get("dias", [])
+                    horarios_individuales = []
+                    for dia in dias:
+                        h_ini = request.POST.get(f"hora_inicio_{dia}")
+                        h_fin = request.POST.get(f"hora_fin_{dia}")
+                        if h_ini and h_fin:
+                            horarios_individuales.append(f"{dia}: {h_ini} - {h_fin}")
+                    horario_texto = ", ".join(horarios_individuales)
+                else:
+                    horario_texto = ""
+
+                # ✅ Contexto para plantilla
                 contexto = form.cleaned_data
                 contexto.update({
                     "nombre": f"{usuario.first_name} {usuario.last_name}".strip(),
@@ -65,8 +99,10 @@ def generar_curso(request):
                     "numerodoc": usuario.documento,
                     "correo": usuario.email,
                     "curso_id": curso.id,
+                    "horario": horario_texto,
                 })
 
+                # ✅ Generar documento
                 ruta_base = os.path.join(settings.BASE_DIR, "curso", "templates", "docs")
                 ruta_plantilla = os.path.join(ruta_base, "plantilla-curso.docx")
                 if not os.path.exists(ruta_plantilla):
@@ -75,7 +111,6 @@ def generar_curso(request):
                 ruta_curso = os.path.join(ruta_base, str(curso.id))
                 os.makedirs(ruta_curso, exist_ok=True)
 
-                # ✅ Renderizar documento
                 doc = DocxTemplate(ruta_plantilla)
                 doc.render(contexto)
 
@@ -101,22 +136,20 @@ def generar_curso(request):
                     reverse("registrar_aspirante", args=[curso.id])
                 )
 
-                # ✅ Guardar en la sesión
+                # ✅ Guardar en sesión
                 request.session["curso_id"] = curso.id
                 request.session["url_aspirantes"] = url_aspirantes
                 request.session["ruta_docx"] = curso.caracterizacion
 
-                # 👉 Redirigir a página de confirmación
                 return redirect("curso_generado")
 
             except Exception as e:
                 return HttpResponse(f"Error generando el documento: {e}", status=500)
 
     else:
-        form = CursoForm(usuario=usuario)
+        form = CursoForm(usuario=usuario)  # ✅ también en GET
 
     return render(request, "formularios/formulario-formato.html", {"form": form})
-
 
 # Obtener datos del programa
 def get_programa(request, programa_id):

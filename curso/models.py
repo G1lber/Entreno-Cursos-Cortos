@@ -98,7 +98,7 @@ class Curso(models.Model):
     carta = models.CharField(max_length=191, null=True, blank=True)  # Ajustado
     pdf_documentos = models.CharField(max_length=191, null=True, blank=True)  # Ajustado
     link = models.CharField(max_length=200, null=True, blank=True)
-
+    
     def __str__(self):
         return f"Curso {self.id} - {self.programa}"
 

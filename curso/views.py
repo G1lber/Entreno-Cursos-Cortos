@@ -20,6 +20,8 @@ from datetime import datetime, timedelta
 from openpyxl import load_workbook
 from django.core.files.images import get_image_dimensions
 from django.core.exceptions import ValidationError
+from django.core.files.storage import FileSystemStorage
+
 
 def dashboard(request):
     return render(request, 'dashboard.html')
@@ -184,7 +186,7 @@ def generate_reports(request, course_id):
         return response
 
     return redirect("reportes")
-
+# Generar curso y documento
 def generar_curso(request):
     usuario = request.user  # Usuario autenticado
 
@@ -304,14 +306,29 @@ def registrar_aspirante(request, curso_id):
     curso = get_object_or_404(Curso, id=curso_id)
 
     if request.method == "POST":
-        form = AspiranteForm(request.POST, request.FILES)  # ✅ importante para archivos
+        form = AspiranteForm(request.POST, request.FILES)
         if form.is_valid():
             aspirante = form.save(commit=False)
             aspirante.curso = curso  # asignamos el curso de la URL
+
+            # ✅ Guardar archivo en carpeta específica del curso
+            if "archivo_documento" in request.FILES:
+                archivo = request.FILES["archivo_documento"]
+
+                # ruta: BASE_DIR/curso/templates/docs/<curso_id>/
+                carpeta_curso = os.path.join(settings.BASE_DIR, "curso", "templates", "docs", str(curso.id))
+                os.makedirs(carpeta_curso, exist_ok=True)
+
+                fs = FileSystemStorage(location=carpeta_curso)
+                nombre_archivo = fs.save(archivo.name, archivo)
+
+                # Guardar la ruta relativa en el modelo
+                aspirante.archivo_documento.name = f"docs/{curso.id}/{nombre_archivo}"
+
             aspirante.save()
 
             messages.success(request, f"Aspirante {aspirante.nombre} registrado con éxito en el curso {curso.programa.nombre}.")
-            return redirect("registrar_aspirante", curso_id=curso.id)  # vuelve al mismo form
+            return redirect("registrar_aspirante", curso_id=curso.id)
         else:
             messages.error(request, "Por favor corrige los errores en el formulario.")
     else:

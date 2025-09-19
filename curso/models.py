@@ -45,14 +45,13 @@ class TipoDocumento(models.Model):
 
 class Usuario(AbstractUser):
     username = None  # Eliminamos username, usamos email
-    email = models.EmailField("correo electrónico", max_length=50,unique=True)
-
+    email = models.EmailField("correo electrónico", max_length=191, unique=True)  # Ajustado
     tipo_documento = models.ForeignKey(
         "TipoDocumento",
         on_delete=models.CASCADE,
         related_name="usuarios"
     )
-    documento = models.CharField(max_length=20, unique=True)  # obligatorio y único
+    documento = models.CharField(max_length=191, unique=True)  # Ajustado
     rol = models.ForeignKey(
         "Rol",
         on_delete=models.CASCADE,
@@ -66,12 +65,13 @@ class Usuario(AbstractUser):
     )
 
     USERNAME_FIELD = "email"
-    REQUIRED_FIELDS = []  # para createsuperuser
+    REQUIRED_FIELDS = []
 
     objects = UsuarioManager()
 
     def __str__(self):
         return f"{self.email} - {self.documento}"
+
 class Curso(models.Model):
     programa = models.ForeignKey(
         Programa,
@@ -87,16 +87,16 @@ class Curso(models.Model):
     fecha_fin = models.DateTimeField()
     max_inscripciones = models.IntegerField(default=25)
     estado = models.IntegerField(null=True, blank=True)
-    caracterizacion = models.CharField(max_length=50, null=True, blank=True)
-    carta = models.CharField(max_length=50, null=True, blank=True)
-    pdf_documentos = models.CharField(max_length=50, null=True, blank=True)
-    aspirantes = models.CharField(max_length=50, null=True, blank=True)
+    caracterizacion = models.CharField(max_length=191, null=True, blank=True)  # Ajustado
+    carta = models.CharField(max_length=191, null=True, blank=True)  # Ajustado
+    pdf_documentos = models.CharField(max_length=191, null=True, blank=True)  # Ajustado
+    aspirantes = models.CharField(max_length=191, null=True, blank=True)  # Ajustado
     link = models.CharField(max_length=200, null=True, blank=True)
 
     def __str__(self):
         return f"Curso {self.id} - {self.programa}"
 
-class Solucitud(models.Model):  # Ojo: en SQL está escrito "solucitud", no "solicitud"
+class Solucitud(models.Model):
     curso = models.ForeignKey(
         Curso,
         on_delete=models.CASCADE,
@@ -110,7 +110,7 @@ class Solucitud(models.Model):  # Ojo: en SQL está escrito "solucitud", no "sol
         return f"Solucitud {self.id} - Curso {self.curso_id}"
 
 class Poblacion(models.Model):
-    nombre = models.CharField("Nombre", max_length=255, unique=True)
+    nombre = models.CharField("Nombre", max_length=191, unique=True)  # Ajustado
 
     class Meta:
         verbose_name = "Población"
@@ -121,9 +121,8 @@ class Poblacion(models.Model):
     
 class Aspirante(models.Model):
     nombre = models.CharField("Nombre", max_length=150)
-    correo = models.EmailField("Correo", max_length=150, unique=True)
+    correo = models.EmailField("Correo", max_length=191, unique=True)  # Ajustado
     telefono = models.CharField("Teléfono", max_length=20, blank=True, null=True)
-
     poblacion = models.ForeignKey(
         Poblacion, on_delete=models.SET_NULL, null=True, blank=True, related_name="aprendices"
     )
@@ -133,8 +132,7 @@ class Aspirante(models.Model):
     curso = models.ForeignKey(
         Curso, on_delete=models.CASCADE, related_name="aprendices"
     )
-
-    documento = models.CharField("Documento", max_length=50, unique=True)
+    documento = models.CharField("Documento", max_length=191, unique=True)  # Ajustado
     archivo_documento = models.FileField("Archivo Documento", upload_to="documentos/", blank=True, null=True)
 
     class Meta:

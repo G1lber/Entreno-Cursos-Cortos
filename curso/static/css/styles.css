@@ -26,15 +26,22 @@ body {
 }
 
 /* Botón volver */
-.back-link {
+.btn-back {
   display: inline-block;
-  margin-bottom: 10px;
-  color: #555;
-  font-size: 14px;
+  padding: 8px 14px;
+  background: transparent;
+  color: #0d0f0c;             /* azul */
+  border: 2px solid #246902;  /* borde azul */
+  border-radius: 6px;
   text-decoration: none;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.2s ease;
 }
-.back-link:hover {
-  color: #000;
+
+.btn-back:hover {
+  background: #246902;
+  color: white;
 }
 
 /* Encabezado */
@@ -58,6 +65,7 @@ body {
 .card {
   background: var(--color-secondary);
   border-radius: var(--border-radius);
+  border: 2px solid var(--color-secundario);
   padding: 1.5rem;
   margin-bottom: 1.5rem;
   box-shadow: 0 2px 6px rgba(0,0,0,0.1);
@@ -118,7 +126,7 @@ body {
 
 /* Report Section */
 .report-section {
-  border-top: 1px solid #eee;
+  border-top: 1px solid #39A900;
   padding-top: 1rem;
   margin-top: 1rem;
 }

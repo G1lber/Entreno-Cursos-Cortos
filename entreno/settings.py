@@ -81,7 +81,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.mysql',   # Driver MySQL
         'NAME': 'cursos_cortos',                      # Nombre de tu base de datos
         'USER': 'root',                        # Usuario de MySQL
-        'PASSWORD': 'root',             # Contraseña
+        'PASSWORD': '',             # Contraseña
         'HOST': '127.0.0.1',                   # Servidor (localhost)
         'PORT': '3306',                        # Puerto por defecto MySQL
         'OPTIONS': {
@@ -133,8 +133,8 @@ STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'static'),
 ]
 
-MEDIA_URL = "/media/"
-MEDIA_ROOT = os.path.join(BASE_DIR, "media")
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field

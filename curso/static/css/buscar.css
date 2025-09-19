@@ -8,22 +8,49 @@
 }
 
 /* Botón volver */
-.back-link {
+.btn-back {
   display: inline-block;
+  padding: 8px 14px;
+  background: transparent;
+  color: #0d0f0c;             /* azul */
+  border: 2px solid #246902;  /* borde azul */
+  border-radius: 6px;
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.btn-back:hover {
+  background: #246902;
+  color: white;
+}
+
+/* Encabezado con botón */
+.header-actions {
+  display: flex;
+  justify-content: space-between; /* separa título y botón */
+  align-items: center;            /* centra verticalmente */
   margin-bottom: 10px;
-  color: #555;
+}
+
+.create {
+  padding: 8px 14px;
+  background: #002b46;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  margin-left: 20px; /* asegura que no quede pegado al h1 */
   font-size: 14px;
   text-decoration: none;
 }
-.back-link:hover {
-  color: #000;
+.create:hover {
+  background: #015081;
 }
 
 /* Títulos */
-h1 {
-  font-size: 24px;
-  margin-bottom: 5px;
-}
+
 .subtitle {
   color: #666;
   margin-bottom: 20px;
@@ -153,4 +180,97 @@ h1 {
 .alert.success {
   background: #d4edda;
   color: #155724;
+}
+/* --- Tabla de resultados --- */
+.table-container {
+  margin-top: 20px;
+  overflow-x: auto; /* scroll en pantallas pequeñas */
+}
+
+.results-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: #fff;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+}
+
+.results-table thead {
+  background: #f5f5f5;
+}
+
+.results-table th, 
+.results-table td {
+  padding: 12px 15px;
+  text-align: left;
+  font-size: 14px;
+  border-bottom: 1px solid #eee;
+}
+
+.results-table th {
+  font-weight: bold;
+  color: #333;
+}
+
+.results-table tbody tr:hover {
+  background: #fafafa;
+}
+
+/* Estado (tags dentro de la tabla) */
+.results-table .tag {
+  font-size: 12px;
+  padding: 3px 8px;
+  border-radius: 6px;
+  font-weight: 500;
+  display: inline-block;
+}
+.results-table .tag.pending {
+  background: #fff3cd;
+  color: #856404;
+}
+.results-table .tag.active {
+  background: #d4edda;
+  color: #155724;
+}
+.results-table .tag.rejected {
+  background: #f8d7da;
+  color: #721c24;
+}
+
+/* Contenedor de botones dentro de la celda */
+td form {
+  display: inline-block;
+  margin-right: 6px; /* separación entre botones */
+  margin-bottom: 5px;
+}
+
+/* Botón Solicitar */
+.btn-solicitar {
+  background: #007bff;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 13px;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+.btn-solicitar:hover {
+  background: #0056b3;
+}
+
+/* Botón Eliminar */
+.btn-eliminar {
+  background: #dc3545;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 13px;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+.btn-eliminar:hover {
+  background: #a71d2a;
 }

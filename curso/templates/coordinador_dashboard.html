@@ -14,7 +14,8 @@
   <div class="container">
 
     <!-- Botón volver -->
-    <a href="{% url 'dashboard' %}" class="back-link">← Volver al Dashboard</a>
+    <a href="{% url 'dashboard' %}" class="btn-back">← Volver</a>
+
 
     <!-- Estadísticas -->
     <div class="stats-grid">
@@ -60,23 +61,23 @@
                   <span class="badge badge-pending">Pendiente</span>
                 </div>
                 <div>
-                  <form method="post" action="{% url 'approve_course' course.id %}" style="display:inline;">
+                  <form method="post" action="{% url 'approve_request' course.id %}" style="display:inline;"> 
                     {% csrf_token %}
                     <button class="button button-approve">Aprobar</button>
                   </form>
-                  <form method="post" action="{% url 'reject_course' course.id %}" style="display:inline;">
+                  <form method="post" action="{% url 'reject_request' course.id %}" style="display:inline;">
                     {% csrf_token %}
                     <button class="button button-reject">Rechazar</button>
                   </form>
                 </div>
               </div>
               <div class="course-details">
-                <div><strong>Instructor:</strong> {{ course.instructorName }}</div>
-                <div><strong>Duración:</strong> {{ course.duration }}</div>
-                <div><strong>Inicio:</strong> {{ course.startDate|date:"d/m/Y" }}</div>
-                <div><strong>Modalidad:</strong> {{ course.modality }}</div>
-                <div><strong>Municipio:</strong> {{ course.municipality }}</div>
-                <div><strong>Horario:</strong> {{ course.days|join:", " }} - {{ course.time }}</div>
+                <div><strong>Instructor:</strong> {{ course.curso.usuario.get_full_name }}</div>
+                <div><strong>Duración:</strong> {{ course.curso.programa.duracion }}</div>
+                <div><strong>Inicio:</strong> {{ course.curso.fecha_inicio|date:"d/m/Y" }}</div>
+                <div><strong>Fin:</strong> {{ course.curso.fecha_fin|date:"d/m/Y" }}</div>
+                <div><strong>Modalidad:</strong> {{ course.curso.programa.modalidad }}</div>
+                <div><strong>Municipio:</strong> {{ course.curso.programa.municipio }}</div>
               </div>
             </div>
           {% endfor %}
@@ -98,7 +99,7 @@
             <div class="course-item course-header">
               <div>
                 <h4>{{ course.program }}</h4>
-                <p class="text-sm">Instructor: {{ course.instructorName }}</p>
+                <p class="text-sm">Instructor: {{ course.curso.usuario.get_full_name }} </p>
               </div>
               <div>
                 {% if course.status == "approved" %}

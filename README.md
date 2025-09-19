@@ -7,9 +7,15 @@
 
 * pip install docxtpl
 
-* pip install pip install django-anymail[graph]
+* pip install django-anymail[graph]
 * pip install "django-anymail[microsoft]"
 
+* pip install pandas
+* pip install openpyxl
+* pip install pillow
+
+* pip install pdf2image
+* pip install pytesseract
 
 # Entreno-Cursos-Cortos
 ### SenaSoft

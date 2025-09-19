@@ -47,7 +47,7 @@ class UsuarioAdmin(UserAdmin):
     ordering = ('email',)
     fieldsets = (
         (None, {'fields': ('email', 'password')}),
-        ('Información personal', {'fields': ('first_name', 'last_name', 'documento', 'tipo_documento', 'rol', 'firma')}),
+        ('Información personal', {'fields': ('first_name', 'last_name', 'documento', 'tipo_documento', 'rol', 'firma_digital')}),
         ('Permisos', {'fields': ('is_active', 'is_staff', 'is_superuser', 'groups', 'user_permissions')}),
         ('Fechas importantes', {'fields': ('last_login', 'date_joined')}),
     )

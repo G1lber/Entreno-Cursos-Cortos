@@ -1,19 +1,48 @@
 from django import forms
-from .models import Usuario, Programa, Departamento, Municipio
+from .models import Usuario, Programa, Departamento, Municipio, Aspirante
+from django.core.validators import FileExtensionValidator
 
 class InicioSesionForm(forms.Form):
-    email = forms.EmailField(label="Correo electrónico")
-    password = forms.CharField(widget=forms.PasswordInput, label="Contraseña")
+    email = forms.EmailField(
+        label="Correo electrónico",
+        widget=forms.EmailInput(attrs={
+            "class": "form-control",
+            "placeholder": "Ingrese su correo"
+        })
+    )
+    password = forms.CharField(
+        label="Contraseña",
+        widget=forms.PasswordInput(attrs={
+            "class": "form-control",
+            "placeholder": "Ingrese su contraseña"
+        })
+    )
 
 
 class UsuarioCreateForm(forms.ModelForm):
     password = forms.CharField(
-        widget=forms.PasswordInput,
+        widget=forms.PasswordInput(attrs={
+            "class": "form-control",
+            "placeholder": "Ingrese su contraseña"
+        }),
         label="Contraseña"
     )
     confirm_password = forms.CharField(
-        widget=forms.PasswordInput,
+        widget=forms.PasswordInput(attrs={
+            "class": "form-control",
+            "placeholder": "Confirme su contraseña"
+        }),
         label="Confirmar contraseña"
+    )
+    firma_digital = forms.ImageField(
+        required=False,
+        label="Firma Digital",
+        help_text="Formatos permitidos: PNG, JPG. Tamaño máximo recomendado: 500x200px",
+        validators=[FileExtensionValidator(allowed_extensions=['png', 'jpg', 'jpeg'])],
+        widget=forms.ClearableFileInput(attrs={
+            "class": "form-control",
+            "accept": "image/png, image/jpeg"
+        })
     )
 
     class Meta:
@@ -27,16 +56,56 @@ class UsuarioCreateForm(forms.ModelForm):
             "password",
             "confirm_password",
             "rol",
-            "firma",
+            "firma_digital",
         ]
+        widgets = {
+            "first_name": forms.TextInput(attrs={
+                "class": "form-control",
+                "placeholder": "Ingrese su nombre"
+            }),
+            "last_name": forms.TextInput(attrs={
+                "class": "form-control",
+                "placeholder": "Ingrese su apellido"
+            }),
+            "email": forms.EmailInput(attrs={
+                "class": "form-control",
+                "placeholder": "Ingrese su correo"
+            }),
+            "documento": forms.TextInput(attrs={
+                "class": "form-control",
+                "placeholder": "Número de documento"
+            }),
+            "tipo_documento": forms.Select(attrs={
+                "class": "form-select"
+            }),
+            "rol": forms.Select(attrs={
+                "class": "form-select"
+            }),
+            "firma": forms.ClearableFileInput(attrs={
+                "class": "form-control"
+            }),
+        }
 
     def clean(self):
         cleaned_data = super().clean()
         password = cleaned_data.get("password")
         confirm_password = cleaned_data.get("confirm_password")
+        firma_digital = cleaned_data.get("firma_digital")
 
         if password and confirm_password and password != confirm_password:
             raise forms.ValidationError("Las contraseñas no coinciden.")
+        return cleaned_data
+    
+        # Validar tamaño de la imagen si se proporciona
+        if firma_digital:
+            try:
+                from django.core.files.images import get_image_dimensions
+                width, height = get_image_dimensions(firma_digital)
+                if width > 500 or height > 200:
+                    raise forms.ValidationError("La imagen de firma no debe exceder 500x200 píxeles")
+            except Exception:
+                raise forms.ValidationError("Error al procesar la imagen de firma")
+        
         return cleaned_data
 
     def save(self, commit=True):
@@ -49,10 +118,23 @@ class UsuarioCreateForm(forms.ModelForm):
 
 class UsuarioEditForm(forms.ModelForm):
     password = forms.CharField(
-        widget=forms.PasswordInput,
+        widget=forms.PasswordInput(attrs={
+            "class": "form-control",
+            "placeholder": "Nueva contraseña"
+        }),
         required=False,
         label="Nueva contraseña",
         help_text="Deja en blanco si no deseas cambiarla."
+    )
+    firma_digital = forms.ImageField(
+        required=False,
+        label="Firma Digital",
+        help_text="Formatos permitidos: PNG, JPG. Tamaño máximo recomendado: 500x200px",
+        validators=[FileExtensionValidator(allowed_extensions=['png', 'jpg', 'jpeg'])],
+        widget=forms.ClearableFileInput(attrs={
+            "class": "form-control",
+            "accept": "image/png, image/jpeg"
+        })
     )
 
     class Meta:
@@ -64,13 +146,56 @@ class UsuarioEditForm(forms.ModelForm):
             "documento",
             "tipo_documento",
             "rol",
-            "firma",
+            "firma_digital",
             "password",
         ]
+        widgets = {
+            "first_name": forms.TextInput(attrs={
+                "class": "form-control",
+                "placeholder": "Ingrese su nombre"
+            }),
+            "last_name": forms.TextInput(attrs={
+                "class": "form-control",
+                "placeholder": "Ingrese su apellido"
+            }),
+            "email": forms.EmailInput(attrs={
+                "class": "form-control",
+                "placeholder": "Ingrese su correo"
+            }),
+            "documento": forms.TextInput(attrs={
+                "class": "form-control"
+            }),
+            "tipo_documento": forms.Select(attrs={
+                "class": "form-select"
+            }),
+            "rol": forms.Select(attrs={
+                "class": "form-select"
+            }),
+            "firma": forms.ClearableFileInput(attrs={
+                "class": "form-control"
+            }),
+        }
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['documento'].disabled = True    
+
+    def clean(self):
+        cleaned_data = super().clean()
+        firma_digital = cleaned_data.get("firma_digital")
+
+        # Validar tamaño de la imagen si se proporciona
+        if firma_digital:
+            try:
+                from django.core.files.images import get_image_dimensions
+                width, height = get_image_dimensions(firma_digital)
+                if width > 500 or height > 200:
+                    raise forms.ValidationError("La imagen de firma no debe exceder 500x200 píxeles")
+            except Exception:
+                raise forms.ValidationError("Error al procesar la imagen de firma")
         
+        return cleaned_data    
+
     def save(self, commit=True):
         usuario = super().save(commit=False)
         password = self.cleaned_data.get("password")
@@ -79,7 +204,6 @@ class UsuarioEditForm(forms.ModelForm):
         if commit:
             usuario.save()
         return usuario
-    
 
 from django import forms
 from .models import Programa, Departamento, Municipio
@@ -278,3 +402,18 @@ class AspiranteForm(forms.Form):
         max_length=20,
         widget=forms.TextInput(attrs={"class": "form-control"})
     )
+
+class AspiranteForm(forms.ModelForm):
+    class Meta:
+        model = Aspirante
+        fields = ["nombre", "documento", "correo", "telefono", "poblacion", "tipo_documento", "archivo_documento"]
+
+        widgets = {
+            "nombre": forms.TextInput(attrs={"class": "form-control", "placeholder": "Nombre completo"}),
+            "documento": forms.TextInput(attrs={"class": "form-control", "placeholder": "Documento"}),
+            "correo": forms.EmailInput(attrs={"class": "form-control", "placeholder": "Correo electrónico"}),
+            "telefono": forms.TextInput(attrs={"class": "form-control", "placeholder": "Teléfono"}),
+            "poblacion": forms.Select(attrs={"class": "form-control"}),
+            "tipo_documento": forms.Select(attrs={"class": "form-control"}),
+            "archivo_documento": forms.ClearableFileInput(attrs={"class": "form-control"}),
+        }

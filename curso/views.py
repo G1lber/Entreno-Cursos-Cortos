@@ -86,7 +86,7 @@ def coordinador(request):
                     "rejected_courses": rejected_courses,
                     "courses": solicitudes,
                     })
-    
+
 #Aprobar-Rechazar Solicitudes
 def approve_request(request, pk):
     solicitud = get_object_or_404(Solucitud, pk=pk)

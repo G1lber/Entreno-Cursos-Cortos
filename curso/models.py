@@ -1,15 +1,13 @@
 from django.db import models
-
-# Create your models here.
-from django.db import models
-
+from django.core.validators import FileExtensionValidator
+from django.contrib.auth.models import AbstractUser
+from .managers import UsuarioManager
 
 class Departamento(models.Model):
     nombre = models.CharField(max_length=50, null=True, blank=True)
 
     def __str__(self):
         return self.nombre or ""
-
 
 class Municipio(models.Model):
     nombre = models.CharField(max_length=50, null=True, blank=True)
@@ -24,7 +22,6 @@ class Municipio(models.Model):
     def __str__(self):
         return self.nombre or ""
 
-
 class Programa(models.Model):
     codigo = models.IntegerField(unique=True, null=True, blank=True)
     duracion = models.CharField(max_length=50, null=True, blank=True)
@@ -34,13 +31,11 @@ class Programa(models.Model):
     def __str__(self):
         return self.nombre or ""
 
-
 class Rol(models.Model):
     nombre = models.CharField(max_length=50, null=True, blank=True)
 
     def __str__(self):
         return self.nombre or ""
-
 
 class TipoDocumento(models.Model):
     nombre = models.CharField(max_length=50, null=True, blank=True)
@@ -48,10 +43,6 @@ class TipoDocumento(models.Model):
     def __str__(self):
         return self.nombre or ""
 
-
-from django.contrib.auth.models import AbstractUser
-from django.db import models
-from .managers import UsuarioManager
 class Usuario(AbstractUser):
     username = None  # Eliminamos username, usamos email
     email = models.EmailField("correo electrónico", max_length=50,unique=True)
@@ -67,7 +58,12 @@ class Usuario(AbstractUser):
         on_delete=models.CASCADE,
         related_name="usuarios"
     )
-    firma = models.ImageField(upload_to='firma/', null=True, blank=True)
+    firma_digital = models.ImageField(
+        upload_to='firmas/', 
+        null=True, 
+        blank=True,
+        validators=[FileExtensionValidator(allowed_extensions=['png', 'jpg', 'jpeg'])]
+    )
 
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = []  # para createsuperuser
@@ -99,7 +95,6 @@ class Curso(models.Model):
 
     def __str__(self):
         return f"Curso {self.id} - {self.programa}"
-
 
 class Solucitud(models.Model):  # Ojo: en SQL está escrito "solucitud", no "solicitud"
     curso = models.ForeignKey(

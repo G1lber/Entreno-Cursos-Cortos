@@ -110,15 +110,21 @@
       </div>
     </div>
 
-    <!-- Firma -->
-    <h5 class="mb-3" style="color:#39A900;">Firma</h5>
-    <div class="mb-3">
-      {{ form.firma.label_tag }}
-      {{ form.firma }}
-      {% if form.firma.errors %}
-        <div class="text-danger small">{{ form.firma.errors }}</div>
+  <!-- Firma -->
+  <h5 class="mb-3" style="color:#39A900;">Firma Digital</h5>
+  <div class="mb-3">
+      {{ form.firma_digital.label_tag }}
+      {{ form.firma_digital }}
+      {% if form.firma_digital.errors %}
+          <div class="text-danger small">{{ form.firma_digital.errors }}</div>
       {% endif %}
-    </div>
+      {% if form.instance.firma_digital %}
+          <div class="mt-2">
+              <p>Firma actual:</p>
+              <img src="{{ form.instance.firma_digital.url }}" alt="Firma actual" class="img-thumbnail" style="max-height: 100px;">
+          </div>
+      {% endif %}
+  </div>
 
     <!-- Botones -->
     <div class="d-flex justify-content-between">

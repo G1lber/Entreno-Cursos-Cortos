@@ -368,7 +368,7 @@ def ocr_aspirante(request):
                 pages = convert_from_path(
                     temp_path,
                     dpi=300,
-                    poppler_path=r"C:\Users\G1lber\Downloads\poppler-25.07.0\Library\bin"
+                    poppler_path=r"C:\Users\SENASoft2025\Downloads\Release-25.07.0-0\poppler-25.07.0\Library\bin"
                 )
                 for page in pages:
                     texto += pytesseract.image_to_string(page, lang="spa")

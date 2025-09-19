@@ -65,7 +65,7 @@
               {% endif %}
             </td>
             <td>
-              {{ course.inscritos.count }} / 25
+              {{ course.inscritos_count }} / {{ course.max_inscripciones }}
             </td>
             <td>
               <a href="{{ course.registrationLink }}" target="_blank">Link</a>

@@ -49,7 +49,7 @@ urlpatterns = [
     path("buscar/", views.buscar_curso, name="buscar_curso"),
     path("coordinador/", views.coordinador, name="coordinador"),
     path("reportes/", views.reportes, name="reportes"),
-    path("generate_reports/<int:course_id>/", views.generate_reports, name="generate_reports"),
+    path("generate_reports/<int:curso_id>/", views.generate_reports, name="generate_reports"),
 
     
      # Generar curso

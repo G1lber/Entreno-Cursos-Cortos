@@ -1,0 +1,85 @@
+ .firma-card {
+        background: white;
+        border-radius: 10px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        overflow: hidden;
+        max-width: 600px;
+        margin: 0 auto;
+    }
+    .firma-card-header {
+        background-color: #39A900;
+        color: white;
+        padding: 20px;
+        text-align: center;
+    }
+    .firma-card-body {
+        padding: 25px;
+    }
+    .firma-alert {
+        background-color: #e9f7e9;
+        border-left: 4px solid #39A900;
+        padding: 15px;
+        margin-bottom: 20px;
+        border-radius: 4px;
+    }
+    .firma-input-wrapper {
+        border: 2px dashed #ccc;
+        border-radius: 8px;
+        padding: 30px;
+        text-align: center;
+        transition: all 0.3s;
+        cursor: pointer;
+    }
+    .firma-input-wrapper:hover {
+        border-color: #39A900;
+        background-color: #f9fff9;
+    }
+    .firma-input-label {
+        cursor: pointer;
+        color: #666;
+    }
+    .firma-input {
+        display: none;
+    }
+    .firma-preview {
+        max-width: 100%;
+        max-height: 150px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        padding: 5px;
+        margin-top: 10px;
+    }
+    .firma-btn-primary {
+        background-color: #39A900;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 5px;
+        color: white;
+        font-weight: 500;
+        transition: all 0.3s;
+    }
+    .firma-btn-primary:hover {
+        background-color: #2d8500;
+        transform: translateY(-2px);
+    }
+    .firma-btn-secondary {
+        background-color: #6c757d;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 5px;
+        color: white;
+        text-decoration: none;
+        display: inline-block;
+        transition: all 0.3s;
+    }
+    .firma-btn-secondary:hover {
+        background-color: #5a6268;
+        color: white;
+        transform: translateY(-2px);
+    }
+    .firma-buttons {
+        display: flex;
+        gap: 10px;
+        justify-content: center;
+        margin-top: 20px;
+    }

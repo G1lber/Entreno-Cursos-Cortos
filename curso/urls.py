@@ -2,9 +2,11 @@ from django.urls import path
 from . import views
 from django.contrib.auth import views as auth_views
 from django.urls import path, reverse_lazy
+from django.conf.urls.static import static
+from django.conf import settings
+
 urlpatterns = [
     
-
     path('', views.inicioSesion, name='inicioSesion'),
     # formulario para ingresar correo
     path('password_reset/', 
@@ -42,6 +44,7 @@ urlpatterns = [
     path('usuario/view/', views.viewUsuarios, name='viewUsuarios'),
     path('usuario/edit/<int:id>/', views.editUsuario, name='editUsuario'),
     path("usuarios/toggle/<int:id>/", views.toggle_usuario, name="toggleUsuario"),
+    path('subir-firma/', views.subir_firma, name='subir_firma'),
     path("dashboard/", views.dashboard, name="dashboard"),
     path("buscar/", views.buscar_curso, name="buscar_curso"),
     path("coordinador/", views.coordinador, name="coordinador"),
@@ -72,3 +75,6 @@ urlpatterns = [
     path("eliminar/<int:curso_id>/", views.eliminar_curso, name="eliminar_curso"),
 
 ]
+
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

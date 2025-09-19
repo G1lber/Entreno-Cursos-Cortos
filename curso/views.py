@@ -18,6 +18,8 @@ from io import BytesIO
 import zipfile
 from datetime import datetime, timedelta
 from openpyxl import load_workbook
+from django.core.files.images import get_image_dimensions
+from django.core.exceptions import ValidationError
 
 def dashboard(request):
     return render(request, 'dashboard.html')
@@ -411,3 +413,41 @@ def toggle_usuario(request, id):
     messages.success(request, f"El usuario {usuario.email} ha sido {estado}.")
     return redirect("viewUsuarios")  # redirige a tu lista de usuarios
 
+@login_required
+def subir_firma(request):
+    if request.method == 'POST':
+        archivo = request.FILES.get('firma')
+        
+        if archivo:
+            # Validar tipo de archivo
+            if archivo.content_type not in ['image/png', 'image/jpeg']:
+                messages.error(request, "Formato no válido. Use PNG o JPG")
+                return redirect('subir_firma')
+            
+            # Validar dimensiones de la imagen
+            try:
+                width, height = get_image_dimensions(archivo)
+                if width > 500 or height > 200:
+                    messages.error(request, "La imagen no debe exceder 500x200 píxeles")
+                    return redirect('subir_firma')
+            except Exception:
+                messages.error(request, "Error al procesar la imagen")
+                return redirect('subir_firma')
+            
+            # Guardar la firma
+            usuario = request.user
+            primera_vez = not bool(usuario.firma_digital)
+            
+            usuario.firma_digital = archivo
+            usuario.save()
+            
+            if primera_vez:
+                messages.success(request, "Firma digital registrada correctamente")
+            else:
+                messages.success(request, "Firma digital actualizada correctamente")
+            
+            return redirect('dashboard')
+        else:
+            messages.error(request, "Debe seleccionar un archivo")
+    
+    return render(request, 'subir_firma.html')

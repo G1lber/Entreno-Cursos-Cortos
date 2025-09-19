@@ -1,5 +1,6 @@
 from django import forms
 from .models import Usuario, Programa, Departamento, Municipio
+from django.core.validators import FileExtensionValidator
 
 class InicioSesionForm(forms.Form):
     email = forms.EmailField(
@@ -33,6 +34,16 @@ class UsuarioCreateForm(forms.ModelForm):
         }),
         label="Confirmar contraseña"
     )
+    firma_digital = forms.ImageField(
+        required=False,
+        label="Firma Digital",
+        help_text="Formatos permitidos: PNG, JPG. Tamaño máximo recomendado: 500x200px",
+        validators=[FileExtensionValidator(allowed_extensions=['png', 'jpg', 'jpeg'])],
+        widget=forms.ClearableFileInput(attrs={
+            "class": "form-control",
+            "accept": "image/png, image/jpeg"
+        })
+    )
 
     class Meta:
         model = Usuario
@@ -45,7 +56,7 @@ class UsuarioCreateForm(forms.ModelForm):
             "password",
             "confirm_password",
             "rol",
-            "firma",
+            "firma_digital",
         ]
         widgets = {
             "first_name": forms.TextInput(attrs={
@@ -79,9 +90,22 @@ class UsuarioCreateForm(forms.ModelForm):
         cleaned_data = super().clean()
         password = cleaned_data.get("password")
         confirm_password = cleaned_data.get("confirm_password")
+        firma_digital = cleaned_data.get("firma_digital")
 
         if password and confirm_password and password != confirm_password:
             raise forms.ValidationError("Las contraseñas no coinciden.")
+        return cleaned_data
+    
+        # Validar tamaño de la imagen si se proporciona
+        if firma_digital:
+            try:
+                from django.core.files.images import get_image_dimensions
+                width, height = get_image_dimensions(firma_digital)
+                if width > 500 or height > 200:
+                    raise forms.ValidationError("La imagen de firma no debe exceder 500x200 píxeles")
+            except Exception:
+                raise forms.ValidationError("Error al procesar la imagen de firma")
+        
         return cleaned_data
 
     def save(self, commit=True):
@@ -102,6 +126,16 @@ class UsuarioEditForm(forms.ModelForm):
         label="Nueva contraseña",
         help_text="Deja en blanco si no deseas cambiarla."
     )
+    firma_digital = forms.ImageField(
+        required=False,
+        label="Firma Digital",
+        help_text="Formatos permitidos: PNG, JPG. Tamaño máximo recomendado: 500x200px",
+        validators=[FileExtensionValidator(allowed_extensions=['png', 'jpg', 'jpeg'])],
+        widget=forms.ClearableFileInput(attrs={
+            "class": "form-control",
+            "accept": "image/png, image/jpeg"
+        })
+    )
 
     class Meta:
         model = Usuario
@@ -112,7 +146,7 @@ class UsuarioEditForm(forms.ModelForm):
             "documento",
             "tipo_documento",
             "rol",
-            "firma",
+            "firma_digital",
             "password",
         ]
         widgets = {
@@ -145,6 +179,22 @@ class UsuarioEditForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['documento'].disabled = True    
+
+    def clean(self):
+        cleaned_data = super().clean()
+        firma_digital = cleaned_data.get("firma_digital")
+
+        # Validar tamaño de la imagen si se proporciona
+        if firma_digital:
+            try:
+                from django.core.files.images import get_image_dimensions
+                width, height = get_image_dimensions(firma_digital)
+                if width > 500 or height > 200:
+                    raise forms.ValidationError("La imagen de firma no debe exceder 500x200 píxeles")
+            except Exception:
+                raise forms.ValidationError("Error al procesar la imagen de firma")
+        
+        return cleaned_data    
 
     def save(self, commit=True):
         usuario = super().save(commit=False)

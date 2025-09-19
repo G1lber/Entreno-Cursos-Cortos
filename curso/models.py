@@ -90,7 +90,6 @@ class Curso(models.Model):
     caracterizacion = models.CharField(max_length=191, null=True, blank=True)  # Ajustado
     carta = models.CharField(max_length=191, null=True, blank=True)  # Ajustado
     pdf_documentos = models.CharField(max_length=191, null=True, blank=True)  # Ajustado
-    aspirantes = models.CharField(max_length=191, null=True, blank=True)  # Ajustado
     link = models.CharField(max_length=200, null=True, blank=True)
 
     def __str__(self):

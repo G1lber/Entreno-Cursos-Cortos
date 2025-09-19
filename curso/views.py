@@ -292,7 +292,7 @@ def generar_curso(request):
     else:
         form = CursoForm(usuario=usuario)  # ✅ también en GET
 
-    return render(request, "formularios/formulario-formato.html", {"form": form})
+    return render(request, "formularios/formulario-formato.html", {"form": form , "usuario": request.user})
 
 # Obtener datos del programa
 def get_programa(request, programa_id):

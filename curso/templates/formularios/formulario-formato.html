@@ -173,18 +173,20 @@
             {{ form.fechafin }}
           </div>
         </div>
-        <div class="form-group">
-          <label for="{{ form.firma.id_for_label }}">Firma instructor</label>
-          {% if form.firma.value %}
-              <div class="mb-3">
-                  <label>Firma del instructor</label><br>
-                  <img src="{{ form.firma.value }}" alt="Firma del instructor" style="max-height:100px;">
-              </div>
-          {% endif %}
-
-        </div>
+      <div class="form-group">
+        <label for="{{ form.firma.id_for_label }}">Firma instructor</label>
+        {% if usuario.firma_digital %}
+            <div class="mb-3">
+                <img src="{{ usuario.firma_digital.url }}" 
+                    alt="Firma del instructor" 
+                    style="max-height:100px;">
+            </div>
+        {% else %}
+            <p>No hay firma registrada.</p>
+        {% endif %}
+        {# campo oculto para mantener compatibilidad con el form #}
+        <input type="hidden" name="firma" value="{{ usuario.firma_digital }}">
       </div>
-
       <!-- BOTONES -->
       <div class="form-actions">
         <button type="submit" class="button-primary">Crear Curso</button>

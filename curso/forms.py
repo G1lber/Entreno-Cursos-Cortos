@@ -354,7 +354,7 @@ class CursoForm(forms.Form):
     firma = forms.FileField(
             label="Firma instructor",
             required=False,
-            widget=forms.ClearableFileInput(attrs={"class": "form-control d-none"})  # oculto en el form
+            widget=forms.ClearableFileInput(attrs={"class": "form-control d-none hidden "})  # oculto en el form
         )
     # ---------- INIT ----------
     def __init__(self, *args, **kwargs):
@@ -378,8 +378,8 @@ class CursoForm(forms.Form):
                 self.fields["tipodoc"].initial = getattr(usuario.tipo_documento, "nombre", "")
             self.fields["numerodoc"].initial = getattr(usuario, "documento", "")
             self.fields["correo"].initial = usuario.email
-            if usuario.firma:
-                self.fields["firma"].initial = usuario.firma
+            if usuario.firma_digital:
+                self.fields["firma"].initial = usuario.firma_digital
 from django import forms
 
 class AspiranteForm(forms.Form):

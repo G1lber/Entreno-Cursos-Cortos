@@ -12,6 +12,11 @@
 
   <form method="post" enctype="multipart/form-data">
     {% csrf_token %}
+
+    <div class="form-group">
+      <label for="{{ form.archivo_documento.id_for_label }}">Archivo Documento</label>
+      {{ form.archivo_documento }}
+    </div>
     
     <div class="form-group">
       <label for="{{ form.nombre.id_for_label }}">Nombre completo</label>
@@ -43,12 +48,41 @@
       {{ form.poblacion }}
     </div>
 
-    <div class="form-group">
-      <label for="{{ form.archivo_documento.id_for_label }}">Archivo Documento</label>
-      {{ form.archivo_documento }}
-    </div>
+    
 
     <button type="submit" class="button-primary">Registrar</button>
   </form>
 </body>
 </html>
+<script>
+document.getElementById("id_archivo_documento").addEventListener("change", async function(e) {
+    let file = e.target.files[0];
+    if (!file) return;
+
+    let formData = new FormData();
+    formData.append("archivo_documento", file);
+
+    let response = await fetch("{% url 'ocr_aspirante' %}", {
+        method: "POST",
+        body: formData,
+        headers: {
+            "X-CSRFToken": "{{ csrf_token }}",
+        }
+    });
+
+    let data = await response.json();
+
+    if (!data.error) {
+        // Documento
+        if (data.documento) {
+            document.getElementById("id_documento").value = data.documento;
+        }
+
+        // Nombre completo (concatenando nombres + apellidos)
+        if (data.nombres || data.apellidos) {
+            document.getElementById("id_nombre").value = 
+                `${data.nombres || ""} ${data.apellidos || ""}`.trim();
+        }
+    }
+});
+</script>

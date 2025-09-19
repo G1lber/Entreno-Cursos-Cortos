@@ -73,6 +73,8 @@ urlpatterns = [
     path("curso/<int:curso_id>/descargar/", views.descargar_curso, name="descargar_curso"),
     # Eliminar curso
     path("eliminar/<int:curso_id>/", views.eliminar_curso, name="eliminar_curso"),
+    # Procesar OCR para un aspirante
+    path("curso/ocr/", views.ocr_aspirante, name="ocr_aspirante"),
 
 ]
 

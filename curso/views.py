@@ -1,3 +1,4 @@
+import re
 from django.shortcuts import redirect, get_object_or_404
 from .models import TipoDocumento, Rol, Usuario,Programa, Departamento, Municipio, Curso, Solucitud
 from .forms import UsuarioEditForm, UsuarioCreateForm, InicioSesionForm, CursoForm
@@ -21,6 +22,10 @@ from openpyxl import load_workbook
 from django.core.files.images import get_image_dimensions
 from django.core.exceptions import ValidationError
 from django.core.files.storage import FileSystemStorage
+from django.views.decorators.csrf import csrf_exempt
+from pdf2image import convert_from_path
+import pytesseract
+from PIL import Image
 
 
 def dashboard(request):
@@ -338,6 +343,90 @@ def registrar_aspirante(request, curso_id):
         "curso": curso,
         "form": form
     })
+# OCR para extraer datos del documento
+
+# Ruta al ejecutable de Tesseract
+pytesseract.pytesseract.tesseract_cmd = r"C:\Program Files\Tesseract-OCR\tesseract.exe"
+
+
+@csrf_exempt
+def ocr_aspirante(request):
+    if request.method == "POST" and request.FILES.get("archivo_documento"):
+        archivo = request.FILES["archivo_documento"]
+
+        # Guardar archivo temporal
+        temp_path = os.path.join(settings.MEDIA_ROOT, archivo.name)
+        with open(temp_path, "wb+") as destino:
+            for chunk in archivo.chunks():
+                destino.write(chunk)
+
+        texto = ""
+
+        try:
+            if archivo.name.lower().endswith(".pdf"):
+                # Convertir PDF a imágenes (con poppler_path)
+                pages = convert_from_path(
+                    temp_path,
+                    dpi=300,
+                    poppler_path=r"C:\Users\G1lber\Downloads\poppler-25.07.0\Library\bin"
+                )
+                for page in pages:
+                    texto += pytesseract.image_to_string(page, lang="spa")
+                    print(texto)
+            else:
+                # Imagen directa
+                img = Image.open(temp_path)
+                texto = pytesseract.image_to_string(img, lang="spa")
+
+            # Regex para capturar datos
+            # Normalizar todo el texto para buscar números
+            texto_numeros = re.sub(r"[^0-9]", "", texto)  # dejar solo dígitos
+
+            # Buscar el número con search
+            match = re.search(r"\d{10}", texto_numeros)
+            numero_doc = match.group() if match else ""   # aquí group está bien
+            # Intento 1: buscar con etiquetas
+            # search(r"NOMBRES?\s*[\r\n]+([A-ZÁÉÍÓÚÑ\s]+)"
+            # search(r"APELLIDOS?\s*[\r\n]+([A-ZÁÉÍÓÚÑ\s]+)"    
+            apellidos = re.search(r"NOMBRES?\s*[\r\n]+([A-ZÁÉÍÓÚÑ\s]+)", texto, re.IGNORECASE)
+            nombres = re.search(r"APELLIDOS?\s*[\r\n]+([A-ZÁÉÍÓÚÑ\s]+)", texto, re.IGNORECASE)
+
+            print(numero_doc, apellidos, nombres)
+
+            # Fallback: bloques de mayúsculas (por si OCR falla con etiquetas)
+            if not (apellidos and nombres):
+                mayusculas = re.findall(r"[A-ZÁÉÍÓÚÑ]{2,}(?:\s+[A-ZÁÉÍÓÚÑ]{2,})+", texto)
+                if len(mayusculas) >= 2:
+                    apellidos = mayusculas[0]
+                    nombres = mayusculas[1]
+                else:
+                    apellidos = ""
+                    nombres = ""
+
+            # Construcción del JSON (soporta tanto regex normal como fallback string)
+            data = {
+                "documento": numero_doc if numero_doc else "",
+                "apellidos": apellidos.group(1).strip() if hasattr(apellidos, "group") else apellidos,
+                "nombres": nombres.group(1).strip() if hasattr(nombres, "group") else nombres,
+                "texto_completo": texto
+            }
+                        
+            return JsonResponse(data)
+
+        except Exception as e:
+            import traceback
+            traceback.print_exc()  # imprime el error completo en consola
+            return JsonResponse(
+                {"error": f"Ocurrió un problema procesando el archivo: {str(e)}"},
+                status=500
+            )
+
+        finally:
+            # Eliminar archivo temporal
+            if os.path.exists(temp_path):
+                os.remove(temp_path)
+
+    return JsonResponse({"error": "Archivo no válido"}, status=400)
 # Descargar documento generado
 def descargar_curso(request, curso_id):
     try:

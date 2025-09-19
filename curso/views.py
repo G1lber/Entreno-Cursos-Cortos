@@ -316,19 +316,21 @@ def registrar_aspirante(request, curso_id):
             aspirante = form.save(commit=False)
             aspirante.curso = curso  # asignamos el curso de la URL
 
-            # ✅ Guardar archivo en carpeta específica del curso
+            # ✅ Guardar archivo en carpeta específica del curso dentro de "aspirantes"
             if "archivo_documento" in request.FILES:
                 archivo = request.FILES["archivo_documento"]
 
-                # ruta: BASE_DIR/curso/templates/docs/<curso_id>/
-                carpeta_curso = os.path.join(settings.BASE_DIR, "curso", "templates", "docs", str(curso.id))
+                # ruta: BASE_DIR/curso/templates/docs/<curso_id>/aspirantes/
+                carpeta_curso = os.path.join(
+                    settings.BASE_DIR, "curso", "templates", "docs", str(curso.id), "aspirantes"
+                )
                 os.makedirs(carpeta_curso, exist_ok=True)
 
                 fs = FileSystemStorage(location=carpeta_curso)
                 nombre_archivo = fs.save(archivo.name, archivo)
 
                 # Guardar la ruta relativa en el modelo
-                aspirante.archivo_documento.name = f"docs/{curso.id}/{nombre_archivo}"
+                aspirante.archivo_documento.name = f"docs/{curso.id}/aspirantes/{nombre_archivo}"
 
             aspirante.save()
 

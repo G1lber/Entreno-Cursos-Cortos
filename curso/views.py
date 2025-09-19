@@ -348,6 +348,7 @@ def registrar_aspirante(request, curso_id):
 # Ruta al ejecutable de Tesseract
 pytesseract.pytesseract.tesseract_cmd = r"C:\Program Files\Tesseract-OCR\tesseract.exe"
 
+
 @csrf_exempt
 def ocr_aspirante(request):
     if request.method == "POST" and request.FILES.get("archivo_documento"):

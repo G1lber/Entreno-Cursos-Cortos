@@ -39,6 +39,21 @@
           </ul>
         </div>
       {% endif %}
+      
+      <!-- FILTROS -->
+      <div class="form-section">
+        <h2>Filtros</h2>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="{{ form.area.id_for_label }}">Área</label>
+            {{ form.area }}
+          </div>
+          <div class="form-group">
+            <label for="{{ form.duracion_filtro.id_for_label }}">Duración (Horas)</label>
+            {{ form.duracion_filtro }}
+          </div>
+        </div>
+      </div>
 
       <!-- DATOS DEL PROGRAMA -->
       <div class="form-section">

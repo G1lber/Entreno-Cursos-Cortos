@@ -55,6 +55,7 @@ urlpatterns = [
      # Generar curso
     path('generar_curso/', views.generar_curso, name='generar_curso'),
     # Obtener datos del programa
+    path("filtrar-programas/", views.filtrar_programas, name="filtrar_programas"),
     path("get-programa/<int:programa_id>/", views.get_programa, name="get_programa"),
     # Obtener municipios por departamento
     path("get-municipios/<int:departamento_id>/", views.get_municipios, name="get_municipios"),

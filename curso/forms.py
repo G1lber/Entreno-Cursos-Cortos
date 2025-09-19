@@ -210,9 +210,32 @@ from .models import Programa, Departamento, Municipio
 
 
 from django import forms
-from .models import Programa, Departamento, Municipio
+from .models import Programa, Departamento, Municipio, Area, Curso 
 
 class CursoForm(forms.Form):
+    
+    # ---------- AREA ----------
+    area = forms.ModelChoiceField(
+        queryset=Area.objects.all(),
+        required=False,
+        label="Área",
+        widget=forms.Select(attrs={"class": "form-control"})
+    )
+    duracion_filtro = forms.ChoiceField(
+        choices=[("", "---------")] + [(d, d) for d in Programa.objects.values_list("duracion", flat=True).distinct()],
+        required=False,
+        label="Duración (Horas)",
+        widget=forms.Select(attrs={"class": "form-control"})
+    )
+
+    class Meta:
+        model = Curso
+        fields = [
+            "nombreprograma", "codigoprograma", "versionprograma", "duracionprograma",
+            "fechainicio", "fechafin", "dias", "horario_inicio", "horario_fin",
+            # … demás campos
+        ]
+    
     # ---------- PROGRAMA ----------
     nombreprograma = forms.ModelChoiceField(
         queryset=Programa.objects.all(),

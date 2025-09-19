@@ -26,3 +26,29 @@
 //   }
 
 // });
+
+document.addEventListener("DOMContentLoaded", function () {
+    const areaSelect = document.getElementById("id_area");
+    const duracionSelect = document.getElementById("id_duracion_filtro");
+    const programaSelect = document.getElementById("id_nombreprograma");
+
+    function cargarProgramas() {
+        const area = areaSelect.value;
+        const duracion = duracionSelect.value;
+
+        fetch(`/filtrar-programas/?area=${area}&duracion=${duracion}`)
+            .then(res => res.json())
+            .then(data => {
+                programaSelect.innerHTML = '<option value="">---------</option>';
+                data.programas.forEach(p => {
+                    const option = document.createElement("option");
+                    option.value = p.id;
+                    option.textContent = `${p.nombre} (v${p.version})`;
+                    programaSelect.appendChild(option);
+                });
+            });
+    }
+
+    areaSelect.addEventListener("change", cargarProgramas);
+    duracionSelect.addEventListener("change", cargarProgramas);
+});

@@ -104,19 +104,10 @@ class Curso(models.Model):
     fecha_inicio = models.DateTimeField()
     fecha_fin = models.DateTimeField()
     max_inscripciones = models.IntegerField(default=25)
-
-    estado = models.ForeignKey(
-        Estado,
-        on_delete=models.SET_NULL,
-        null=True,
-        blank=True,
-        related_name="cursos"
-    )
-
-    caracterizacion = models.CharField(max_length=50, null=True, blank=True)
-    carta = models.CharField(max_length=50, null=True, blank=True)
-    pdf_documentos = models.CharField(max_length=50, null=True, blank=True)
-    aspirantes = models.CharField(max_length=50, null=True, blank=True)
+    estado = models.IntegerField(null=True, blank=True)
+    caracterizacion = models.CharField(max_length=191, null=True, blank=True)  # Ajustado
+    carta = models.CharField(max_length=191, null=True, blank=True)  # Ajustado
+    pdf_documentos = models.CharField(max_length=191, null=True, blank=True)  # Ajustado
     link = models.CharField(max_length=200, null=True, blank=True)
 
     def __str__(self):

@@ -64,7 +64,9 @@
                 <span class="tag rejected">Rechazado</span>
               {% endif %}
             </td>
-            <td>0/25</td>
+            <td>
+              {{ course.inscritos.count }} / 25
+            </td>
             <td>
               <a href="{{ course.registrationLink }}" target="_blank">Link</a>
             </td>

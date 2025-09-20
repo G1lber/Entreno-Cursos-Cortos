@@ -1,6 +1,6 @@
 import re
 from django.shortcuts import redirect, get_object_or_404
-from .models import TipoDocumento, Rol, Usuario,Programa, Departamento, Municipio, Curso, Solucitud
+from .models import TipoDocumento, Rol, Usuario,Programa, Departamento, Municipio, Curso, Solucitud, Aspirante
 from .forms import UsuarioEditForm, UsuarioCreateForm, InicioSesionForm, CursoForm
 from django.urls import reverse
 from django.contrib import messages
@@ -26,6 +26,7 @@ from django.views.decorators.csrf import csrf_exempt
 from pdf2image import convert_from_path
 import pytesseract
 from PIL import Image
+from django.db.models import Count
 
 
 def dashboard(request):
@@ -37,7 +38,9 @@ def buscar_curso(request):
     courses = []
 
     if q:
-        courses = Curso.objects.filter(
+        courses = Curso.objects.annotate(
+            inscritos_count=Count("aprendices")
+        ).filter(
             Q(programa__nombre__icontains=q) |
             Q(usuario__first_name__icontains=q) |
             Q(usuario__last_name__icontains=q) |
@@ -102,113 +105,79 @@ def reject_request(request, pk):
 
 #Reportes
 def reportes(request):
-    cursos = Curso.objects.all().order_by('-fecha_inicio')
+    cursos = Curso.objects.annotate(
+        inscripciones_count=Count("aprendices")
+    ).order_by('-fecha_inicio')
     return render(request, 'reportes.html', {'cursos': cursos})
 
-def generate_reports(request, course_id):
-    if request.method == "POST":
-        course = get_object_or_404(Curso, id=course_id)
+def generate_reports(request, curso_id):
+    course = Curso.objects.get(id=curso_id)
+    aspirantes = Aspirante.objects.filter(curso=course)
 
-        # Reporte 1 en plantilla XLSM
-        ruta_plantilla = os.path.join(
-            settings.BASE_DIR,
-            "curso", "templates", "docs", "Masivo 2024 MOISO.xlsm"
-        )
+    # ---------- REPORTE 1 (pandas - todos los datos) ----------
+    aspirantes_data1 = []
+    for asp in aspirantes:
+        partes = asp.nombre.strip().split(" ", 1)
+        nombres = partes[0] if len(partes) > 0 else ""
+        apellidos = partes[1] if len(partes) > 1 else ""
 
-        wb = load_workbook(ruta_plantilla, keep_vba=True)
-        ws = wb.active  # puedes usar ws = wb["Hoja1"] si tu hoja tiene nombre
-        # Traer aspirantes relacionados al curso
-        aspirantes = course.aspirante_set.all()  # FK Curso → Aspirante
+        aspirantes_data1.append([
+            asp.tipo_documento.nombre if asp.tipo_documento else "",
+            asp.documento,
+            nombres,
+            apellidos,
+            asp.correo,
+            asp.telefono if asp.telefono else "",
+            asp.poblacion.nombre if asp.poblacion else "",
+            course.programa.nombre if course.programa else "",
+        ])
 
-        fila = 5  # empieza a llenar desde fila 5
-        for asp in aspirantes:
-            ws[f"B{fila}"] = asp.tipo_documento.nombre if asp.tipo_documento else ""
-            ws[f"C{fila}"] = asp.documento
-            ws[f"D{fila}"] = getattr(asp, "tipo_poblacion", "Estudiante")  # ejemplo
+    df1 = pd.DataFrame(aspirantes_data1, columns=[
+        "Tipo Documento",
+        "Documento",
+        "Nombres",
+        "Apellidos",
+        "Correo",
+        "Teléfono",
+        "Población",
+        "Programa"
+    ])
 
-            # 🔹 Dejar F y G vacías
-            ws[f"F{fila}"] = ""
-            ws[f"G{fila}"] = ""
+    buffer1 = BytesIO()
+    df1.to_excel(buffer1, index=False, engine="openpyxl")
+    buffer1.seek(0)
 
-            fila += 1
+    # ---------- REPORTE 2 (llenando plantilla .xlsm, sin macros) ----------
+    plantilla_path = os.path.join(settings.BASE_DIR, "curso", "templates", "docs", "Masivo 2024 MOISO.xlsm")
+    wb = load_workbook(plantilla_path)
+    ws = wb.active  # o selecciona por nombre: wb["Hoja1"]
 
-        reporte1 = BytesIO()
-        wb.save(reporte1)
-        reporte1.seek(0)
+    fila = 3  # empezar desde la fila 3
+    for asp in aspirantes:
+        ws[f"B{fila}"] = asp.tipo_documento.nombre if asp.tipo_documento else ""
+        ws[f"C{fila}"] = asp.documento
+        ws[f"E{fila}"] = asp.poblacion.nombre if asp.poblacion else ""
+        fila += 1
 
-        #Reporte 2 con pandas
-        aspirantes_data = [
-            [
-                asp.tipo_documento.nombre if asp.tipo_documento else "",
-                asp.documento,
-                asp.first_name,
-                asp.last_name,
-                asp.email,
-                getattr(asp, "celular", ""),  # si tienes un campo teléfono
-                course.programa.nombre if course.programa else "",
-            ]
-            for asp in aspirantes
-        ]
+    buffer2 = BytesIO()
+    wb.save(buffer2)
+    buffer2.seek(0)
 
-        df2 = pd.DataFrame(
-            aspirantes_data,
-            columns=[
-                "Tipo Documento",
-                "Documento",
-                "Nombre",
-                "Apellido",
-                "Email",
-                "Número",
-                "Programa",
-            ],
-        )
+    # ---------- EMPAQUETAR ZIP ----------
+    zip_buffer = BytesIO()
+    with zipfile.ZipFile(zip_buffer, "w") as zip_file:
+        zip_file.writestr(f"Reporte_Completo_curso_{curso_id}.xlsx", buffer1.getvalue())
+        zip_file.writestr(f"Reporte_Poblacion_curso_{curso_id}.xlsx", buffer2.getvalue())
 
-        reporte2 = BytesIO()
-        df2.to_excel(reporte2, index=False)
-        reporte2.seek(0)
+    zip_buffer.seek(0)
 
-        #Empaquetar ZIP
-        buffer = BytesIO()
-        with zipfile.ZipFile(buffer, "w") as zip_file:
-            # Guardar reporte 1
-            zip_file.writestr(
-                f"reporte1_{course.programa.nombre if course.programa else 'curso'}.xlsm",
-                reporte1.getvalue(),
-            )
-            # Guardar reporte 2
-            zip_file.writestr(
-                f"reporte2_{course.programa.nombre if course.programa else 'curso'}.xlsx",
-                reporte2.getvalue(),
-            )
+    response = HttpResponse(zip_buffer, content_type="application/zip")
+    response["Content-Disposition"] = f'attachment; filename="reportes_curso_{curso_id}.zip"'
 
-        buffer.seek(0)
+    return response
 
-        response = HttpResponse(buffer, content_type="application/zip")
-        response[
-            "Content-Disposition"
-        ] = f'attachment; filename=\"reportes_{course.programa.nombre if course.programa else 'curso'}.zip\"'
-        return response
-
-    return redirect("reportes")
 # Generar curso y documento
-import os
-from django.conf import settings
-from django.shortcuts import render, redirect
-from django.http import HttpResponse
-from django.urls import reverse
-from docxtpl import DocxTemplate, InlineImage
-from docx.shared import Mm
-from .forms import CursoForm
-from .models import Curso
-from docxtpl import DocxTemplate, InlineImage
-from docx.shared import Mm
-import os
-from django.shortcuts import render, redirect
-from django.http import HttpResponse
-from django.urls import reverse
-from django.conf import settings
-
-def generar_curso(request):
+def generar_curso(request, tipo):
     usuario = request.user  # Usuario autenticado
 
     if request.method == "POST":
@@ -225,6 +194,7 @@ def generar_curso(request):
                     usuario=usuario,
                     fecha_inicio=fecha_inicio,
                     fecha_fin=fecha_fin,
+                    tipo_oferta=tipo,
                 )
 
                 # ✅ Preparar horario
@@ -318,28 +288,11 @@ def generar_curso(request):
     else:
         form = CursoForm(usuario=usuario)
 
-    return render(
-        request,
-        "formularios/formulario-formato.html",
-        {"form": form, "usuario": request.user}
-    )
-    
-def filtrar_programas(request):
-    area_id = request.GET.get("area")
-    duracion = request.GET.get("duracion")
+    return render(request, "formularios/formulario-formato.html", {"form": form, "tipo": tipo, })
 
-    programas = Programa.objects.all()
+def tipo_oferta(request):
+    return render(request, "tipo_oferta.html")
 
-    if area_id:
-        programas = programas.filter(area_id=area_id)
-    if duracion:
-        programas = programas.filter(duracion=duracion)
-
-    data = [
-        {"id": p.id, "nombre": p.nombre, "codigo": p.codigo, "version": p.version, "duracion": p.duracion}
-        for p in programas
-    ]
-    return JsonResponse({"programas": data})
 
 # Obtener datos del programa
 def get_programa(request, programa_id):
@@ -353,10 +306,12 @@ def get_programa(request, programa_id):
         return JsonResponse(data)
     except Programa.DoesNotExist:
         return JsonResponse({"error": "Programa no encontrado"}, status=404)
+    
 # Obtener datos de departamento y municipio
 def get_municipios(request, departamento_id):
     municipios = Municipio.objects.filter(departamento_id=departamento_id).values("id", "nombre")
     return JsonResponse(list(municipios), safe=False)
+
 # Página que muestra el ID del curso y la URL para registrar aspirantes
 def curso_generado(request):
     curso_id = request.session.get("curso_id")
@@ -413,11 +368,10 @@ def registrar_aspirante(request, curso_id):
         "curso": curso,
         "form": form
     })
-# OCR para extraer datos del documento
 
+# OCR para extraer datos del documento
 # Ruta al ejecutable de Tesseract
 pytesseract.pytesseract.tesseract_cmd = r"C:\Program Files\Tesseract-OCR\tesseract.exe"
-
 
 @csrf_exempt
 def ocr_aspirante(request):
@@ -497,6 +451,7 @@ def ocr_aspirante(request):
                 os.remove(temp_path)
 
     return JsonResponse({"error": "Archivo no válido"}, status=400)
+
 # Descargar documento generado
 def descargar_curso(request, curso_id):
     try:

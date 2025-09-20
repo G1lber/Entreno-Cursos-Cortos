@@ -49,7 +49,7 @@ urlpatterns = [
     path("buscar/", views.buscar_curso, name="buscar_curso"),
     path("coordinador/", views.coordinador, name="coordinador"),
     path("reportes/", views.reportes, name="reportes"),
-    path("generate_reports/<int:course_id>/", views.generate_reports, name="generate_reports"),
+    path("generate_reports/<int:curso_id>/", views.generate_reports, name="generate_reports"),
 
     
      # Generar curso
@@ -59,6 +59,8 @@ urlpatterns = [
     path("get-programa/<int:programa_id>/", views.get_programa, name="get_programa"),
     # Obtener municipios por departamento
     path("get-municipios/<int:departamento_id>/", views.get_municipios, name="get_municipios"),
+    path("tipo-oferta/", views.tipo_oferta, name="tipo_oferta"),
+    path("generar-curso/<str:tipo>/", views.generar_curso, name="generar_curso"),
 
     
     # aprobar - rechazar solicitudes

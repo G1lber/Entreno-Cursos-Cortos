@@ -11,7 +11,8 @@
   <!-- Encabezado -->
   <div class="header-actions">
     <h1>Buscar Ofertas</h1>
-    <a class="create" href={% url 'generar_curso' %} >＋ Crear Oferta</a>
+    <a class="create" href="{% url 'tipo_oferta' %}">＋ Crear Oferta</a>
+
   </div>
 
   <p class="subtitle">Explora todos tus ofertas disponibles</p>
@@ -64,7 +65,9 @@
                 <span class="tag rejected">Rechazado</span>
               {% endif %}
             </td>
-            <td>0/25</td>
+            <td>
+              {{ course.inscritos_count }} / {{ course.max_inscripciones }}
+            </td>
             <td>
               <a href="{{ course.registrationLink }}" target="_blank">Link</a>
             </td>

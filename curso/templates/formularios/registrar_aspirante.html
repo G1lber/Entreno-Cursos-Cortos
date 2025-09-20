@@ -13,6 +13,21 @@
   <form method="post" enctype="multipart/form-data">
     {% csrf_token %}
 
+      <!-- Mensajes -->
+    {% if messages %}
+      {% for message in messages %}
+        <div class="alert alert-dismissible fade show mb-3
+            {% if message.tags == 'success' %}alert-success
+            {% elif message.tags == 'error' or message.tags == 'danger' %}alert-danger
+            {% elif message.tags == 'warning' %}alert-warning
+            {% else %}alert-info{% endif %}"
+            role="alert">
+          {{ message }}
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
+        </div>
+      {% endfor %}
+    {% endif %}
+
     <div class="form-group">
       <label for="{{ form.archivo_documento.id_for_label }}">Archivo Documento</label>
       {{ form.archivo_documento }}

@@ -177,7 +177,7 @@ def generate_reports(request, curso_id):
     return response
 
 # Generar curso y documento
-def generar_curso(request):
+def generar_curso(request, tipo):
     usuario = request.user  # Usuario autenticado
 
     if request.method == "POST":
@@ -194,6 +194,7 @@ def generar_curso(request):
                     usuario=usuario,
                     fecha_inicio=fecha_inicio,
                     fecha_fin=fecha_fin,
+                    tipo_oferta=tipo,
                 )
 
                 # ✅ Preparar documento
@@ -254,7 +255,11 @@ def generar_curso(request):
     else:
         form = CursoForm(usuario=usuario)
 
-    return render(request, "formularios/formulario-formato.html", {"form": form})
+    return render(request, "formularios/formulario-formato.html", {"form": form, "tipo": tipo, })
+
+def tipo_oferta(request):
+    return render(request, "tipo_oferta.html")
+
 
 # Obtener datos del programa
 def get_programa(request, programa_id):

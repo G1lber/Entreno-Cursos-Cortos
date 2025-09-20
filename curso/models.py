@@ -80,6 +80,11 @@ class Usuario(AbstractUser):
         return f"{self.email} - {self.documento}"
 
 class Curso(models.Model):
+    TIPO_OFERTA_CHOICES = [
+        ("campesena", "Campesena"),
+        ("regular", "Regular"),
+    ]
+
     programa = models.ForeignKey(
         Programa,
         on_delete=models.CASCADE,
@@ -98,6 +103,7 @@ class Curso(models.Model):
     carta = models.CharField(max_length=191, null=True, blank=True)  # Ajustado
     pdf_documentos = models.CharField(max_length=191, null=True, blank=True)  # Ajustado
     link = models.CharField(max_length=200, null=True, blank=True)
+    tipo_oferta = models.CharField( max_length=20, choices=TIPO_OFERTA_CHOICES, default="regular")
 
     def __str__(self):
         return f"Curso {self.id} - {self.programa}"

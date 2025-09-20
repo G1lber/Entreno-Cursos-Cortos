@@ -11,6 +11,25 @@
         <form method="post" enctype="multipart/form-data">
           {% csrf_token %}
 
+            <h2 class="text-center mb-4">
+              Creando Oferta {{ tipo|title }}
+            </h2>
+
+            <!-- Mensajes -->
+            {% if messages %}
+              {% for message in messages %}
+                <div class="alert alert-dismissible fade show mb-3
+                    {% if message.tags == 'success' %}alert-success
+                    {% elif message.tags == 'error' or message.tags == 'danger' %}alert-danger
+                    {% elif message.tags == 'warning' %}alert-warning
+                    {% else %}alert-info{% endif %}"
+                    role="alert">
+                  {{ message }}
+                  <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
+                </div>
+              {% endfor %}
+            {% endif %}
+
           <!-- DATOS DEL PROGRAMA -->
           <div class="form-section">
             <h2>Datos del programa</h2>

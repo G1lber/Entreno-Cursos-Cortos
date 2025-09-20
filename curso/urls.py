@@ -58,6 +58,8 @@ urlpatterns = [
     path("get-programa/<int:programa_id>/", views.get_programa, name="get_programa"),
     # Obtener municipios por departamento
     path("get-municipios/<int:departamento_id>/", views.get_municipios, name="get_municipios"),
+    path("tipo-oferta/", views.tipo_oferta, name="tipo_oferta"),
+    path("generar-curso/<str:tipo>/", views.generar_curso, name="generar_curso"),
 
     
     # aprobar - rechazar solicitudes

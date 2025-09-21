@@ -293,6 +293,22 @@ def generar_curso(request, tipo):
 def tipo_oferta(request):
     return render(request, "tipo_oferta.html")
 
+def filtrar_programas(request):
+    area_id = request.GET.get("area")
+    duracion = request.GET.get("duracion")
+
+    programas = Programa.objects.all()
+
+    if area_id:
+        programas = programas.filter(area_id=area_id)
+    if duracion:
+        programas = programas.filter(duracion=duracion)
+
+    data = [
+        {"id": p.id, "nombre": p.nombre, "codigo": p.codigo, "version": p.version, "duracion": p.duracion}
+        for p in programas
+    ]
+    return JsonResponse({"programas": data})
 
 # Obtener datos del programa
 def get_programa(request, programa_id):

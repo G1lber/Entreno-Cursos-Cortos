@@ -222,7 +222,7 @@ class CursoForm(forms.Form):
         widget=forms.Select(attrs={"class": "form-control"})
     )
     duracion_filtro = forms.ChoiceField(
-        choices=[("", "---------")] + [(d, d) for d in Programa.objects.values_list("duracion", flat=True).distinct()],
+        choices=[],
         required=False,
         label="Duración (Horas)",
         widget=forms.Select(attrs={"class": "form-control"})
@@ -383,6 +383,11 @@ class CursoForm(forms.Form):
     def __init__(self, *args, **kwargs):
         usuario = kwargs.pop("usuario", None)
         super().__init__(*args, **kwargs)
+
+        
+        self.fields["duracion_filtro"].choices = [("", "---------")] + [
+            (d, d) for d in Programa.objects.values_list("duracion", flat=True).distinct() if d
+        ]
 
         # Manejo dinámico de municipios
         if "departamento" in self.data:

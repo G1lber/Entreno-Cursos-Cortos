@@ -73,12 +73,12 @@ def eliminar_curso(request, curso_id):
 def crear_solicitud(request, curso_id):
     if request.method == "POST":
         curso = get_object_or_404(Curso, id=curso_id)
-        Solicitud.objects.create(curso=curso, estado=1)  # 👈 estado = 1
+        Solicitud.objects.create(curso=curso, estado=0)  # 👈 estado = 1
     return redirect("buscar_curso")  # 👈 cámbialo al nombre real de tu vista de búsqueda
     
 #Coordinador
 def coordinador(request):
-    solicitudes = Solucitud.objects.select_related("curso__programa", "curso__usuario")
+    solicitudes = Solicitud.objects.select_related("curso__programa", "curso__usuario")
 
     # Creamos un diccionario de traducción
     estado_map = {
@@ -103,13 +103,13 @@ def coordinador(request):
 
 #Aprobar-Rechazar Solicitudes
 def approve_request(request, pk):
-    solicitud = get_object_or_404(Solucitud, pk=pk)
+    solicitud = get_object_or_404(Solicitud, pk=pk)
     solicitud.estado = 1  # aprobado
     solicitud.save()
     return redirect("coordinador")  
 
 def reject_request(request, pk):
-    solicitud = get_object_or_404(Solucitud, pk=pk)
+    solicitud = get_object_or_404(Solicitud, pk=pk)
     solicitud.estado = 2  # rechazado
     solicitud.save()
     return redirect("coordinador")

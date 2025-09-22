@@ -73,8 +73,19 @@ def eliminar_curso(request, curso_id):
 def crear_solicitud(request, curso_id):
     if request.method == "POST":
         curso = get_object_or_404(Curso, id=curso_id)
-        Solicitud.objects.create(curso=curso, estado=0)  # 👈 estado = 1
-    return redirect("buscar_curso")  # 👈 cámbialo al nombre real de tu vista de búsqueda
+
+        # Buscar si ya hay una solicitud de este curso
+        solicitud, creada = Solicitud.objects.get_or_create(
+            curso=curso,
+            defaults={"estado": 0}  # si no existe, se crea con estado=0
+        )
+
+        if not creada:
+            # si ya existía, la actualizamos
+            solicitud.estado = 0
+            solicitud.save()
+
+    return redirect("buscar_curso")  # 👈 cambia al nombre real de tu vista de búsqueda
     
 #Coordinador
 def coordinador(request):

@@ -27,6 +27,10 @@ from pdf2image import convert_from_path
 import pytesseract
 from PIL import Image
 from django.db.models import Count
+from PyPDF2 import PdfMerger   
+import tempfile
+import shutil
+
 
 
 def dashboard(request):
@@ -355,25 +359,55 @@ def registrar_aspirante(request, curso_id):
         form = AspiranteForm(request.POST, request.FILES)
         if form.is_valid():
             aspirante = form.save(commit=False)
-            aspirante.curso = curso  # asignamos el curso de la URL
+            aspirante.curso = curso  
 
-            # ✅ Guardar archivo en carpeta específica del curso
             if "archivo_documento" in request.FILES:
                 archivo = request.FILES["archivo_documento"]
 
-                # ruta: BASE_DIR/curso/templates/docs/<curso_id>/
-                carpeta_curso = os.path.join(settings.BASE_DIR, "curso", "templates", "docs", str(curso.id))
+                # 📂 Carpeta del curso
+                carpeta_curso = os.path.join(
+                    settings.BASE_DIR, "curso", "templates", "docs", str(curso.id), "aspirantes"
+                )
                 os.makedirs(carpeta_curso, exist_ok=True)
+                
+                url_pdf_global = os.path.join(
+                    settings.BASE_DIR, "curso", "templates", "docs", str(curso.id)
+                )
+                os.makedirs(url_pdf_global, exist_ok=True)
 
                 fs = FileSystemStorage(location=carpeta_curso)
                 nombre_archivo = fs.save(archivo.name, archivo)
 
                 # Guardar la ruta relativa en el modelo
-                aspirante.archivo_documento.name = f"docs/{curso.id}/{nombre_archivo}"
+                aspirante.archivo_documento.name = f"docs/{curso.id}/aspirantes/{nombre_archivo}"
+
+                # 📌 Consolidado por curso
+                pdf_padre_path = os.path.join(url_pdf_global, "aspirantes_consolidado.pdf")
+                pdf_nuevo_path = os.path.join(carpeta_curso, nombre_archivo)
+
+                merger = PdfMerger()
+
+                # Si ya existe un consolidado, lo cargamos primero
+                if os.path.exists(pdf_padre_path):
+                    merger.append(pdf_padre_path)
+
+                # Agregamos el nuevo PDF al final
+                merger.append(pdf_nuevo_path)
+
+                # Guardamos en archivo temporal para evitar corrupción
+                with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as tmp_file:
+                    merger.write(tmp_file.name)
+                    merger.close()
+
+                # Reemplazamos el consolidado con el archivo temporal
+                shutil.move(tmp_file.name, pdf_padre_path)
 
             aspirante.save()
 
-            messages.success(request, f"Aspirante {aspirante.nombre} registrado con éxito en el curso {curso.programa.nombre}.")
+            messages.success(
+                request,
+                f"Aspirante {aspirante.nombre} registrado con éxito en el curso {curso.programa.nombre}."
+            )
             return redirect("registrar_aspirante", curso_id=curso.id)
         else:
             messages.error(request, "Por favor corrige los errores en el formulario.")

@@ -1,7 +1,7 @@
 from django.contrib import admin
 from .models import (
     Departamento, Municipio, Programa, Rol, TipoDocumento,
-    Usuario, Curso, Solucitud
+    Usuario, Curso, Solicitud
 )
 
 # ----------------------------
@@ -68,10 +68,10 @@ class CursoAdmin(admin.ModelAdmin):
     search_fields = ('usuario__email', 'programa__nombre')
 
 # ----------------------------
-# Solucitudes
+# Solicitudes
 # ----------------------------
-@admin.register(Solucitud)
-class SolucitudAdmin(admin.ModelAdmin):
+@admin.register(Solicitud)
+class SolicitudAdmin(admin.ModelAdmin):
     list_display = ('id', 'curso', 'estado')
     list_filter = ('estado', 'curso__programa')
     search_fields = ('curso__usuario__email',)

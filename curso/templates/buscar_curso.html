@@ -72,11 +72,10 @@
               <a href="{{ course.registrationLink }}" target="_blank">Link</a>
             </td>
             <td>
-              <form method="post" action="#" style="display:inline;">
-                {% csrf_token %}
-                <button type="submit" class="btn-solicitar">Solicitar</button>
+              <form method="post" action="{% url 'crear_solicitud' course.id %}" style="display:inline;">
+                  {% csrf_token %}
+                  <button type="submit" class="btn-solicitar">Solicitar</button>
               </form>
-
               <form method="post" action="{% url 'eliminar_curso' course.id %}" style="display:inline;">
                 {% csrf_token %}
                 <button type="submit" class="btn-eliminar">Eliminar</button>

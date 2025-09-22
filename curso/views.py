@@ -1,6 +1,6 @@
 import re
 from django.shortcuts import redirect, get_object_or_404
-from .models import TipoDocumento, Rol, Usuario,Programa, Departamento, Municipio, Curso, Solucitud, Aspirante
+from .models import TipoDocumento, Rol, Usuario,Programa, Departamento, Municipio, Curso, Solicitud, Aspirante
 from .forms import UsuarioEditForm, UsuarioCreateForm, InicioSesionForm, CursoForm
 from django.urls import reverse
 from django.contrib import messages
@@ -68,6 +68,13 @@ def eliminar_curso(request, curso_id):
         curso.delete()
         messages.success(request, f"El curso {curso.programa.nombre} fue eliminado correctamente.")
     return redirect("buscar_curso")
+
+#Crear Solicitud
+def crear_solicitud(request, curso_id):
+    if request.method == "POST":
+        curso = get_object_or_404(Curso, id=curso_id)
+        Solicitud.objects.create(curso=curso, estado=1)  # 👈 estado = 1
+    return redirect("buscar_curso")  # 👈 cámbialo al nombre real de tu vista de búsqueda
     
 #Coordinador
 def coordinador(request):

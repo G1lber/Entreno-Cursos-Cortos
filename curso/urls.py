@@ -66,6 +66,8 @@ urlpatterns = [
     # aprobar - rechazar solicitudes
     path("solicitud/<int:pk>/aprobar/", views.approve_request, name="approve_request"),
     path("solicitud/<int:pk>/rechazar/", views.reject_request, name="reject_request"),
+    # Crear solicitud para un curso específico
+    path("curso/<int:curso_id>/solicitar/", views.crear_solicitud, name="crear_solicitud"),
     
 
     # Registrar aspirante a un curso

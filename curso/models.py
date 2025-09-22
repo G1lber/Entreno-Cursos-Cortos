@@ -108,18 +108,18 @@ class Curso(models.Model):
     def __str__(self):
         return f"Curso {self.id} - {self.programa}"
 
-class Solucitud(models.Model):
+class Solicitud(models.Model):
     curso = models.ForeignKey(
         Curso,
         on_delete=models.CASCADE,
         null=True,
         blank=True,
-        related_name="solucitudes"
+        related_name="solicitudes"
     )
     estado = models.IntegerField(null=True, blank=True)
 
     def __str__(self):
-        return f"Solucitud {self.id} - Curso {self.curso_id}"
+        return f"Solicitud {self.id} - Curso {self.curso_id}"
 
 class Poblacion(models.Model):
     nombre = models.CharField("Nombre", max_length=191, unique=True)  # Ajustado

@@ -77,6 +77,12 @@
                 <div><strong>Inicio:</strong> {{ course.curso.fecha_inicio|date:"d/m/Y" }}</div>
                 <div><strong>Fin:</strong> {{ course.curso.fecha_fin|date:"d/m/Y" }}</div>
               </div>
+              <div >
+                 <form  class="detalles_btn" method="post" action="" >
+                    {% csrf_token %}
+                    <button class="button button-approve">Ver Detalles</button>
+                  </form>
+              </div>
             </div>
           {% endfor %}
         {% else %}

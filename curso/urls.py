@@ -69,6 +69,9 @@ urlpatterns = [
     # Crear solicitud para un curso específico
     path("curso/<int:curso_id>/solicitar/", views.crear_solicitud, name="crear_solicitud"),
     
+    # ver detalles del curso
+    path("curso/<int:pk>/detalle/", views.curso_detalle, name="curso_detalle"),
+    
 
     # Registrar aspirante a un curso
     path("curso/<int:curso_id>/aspirantes/", views.registrar_aspirante, name="registrar_aspirante"),

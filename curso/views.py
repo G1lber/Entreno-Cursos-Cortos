@@ -131,6 +131,43 @@ def reject_request(request, pk):
     solicitud.save()
     return redirect("coordinador")
 
+# Ver detalles 
+def curso_detalle(request, pk):
+    curso = get_object_or_404(Curso, pk=pk)
+
+    form = CursoForm(initial={
+        # PROGRAMA (FK)
+        "nombreprograma": curso.programa,  
+        "codigoprograma": curso.programa.codigo,   
+        "versionprograma": curso.programa.version, 
+        "duracionprograma": curso.programa.duracion,
+
+        # FECHAS
+        "fechainicio": curso.fecha_inicio,
+        "fechafin": curso.fecha_fin,
+
+        # RESPONSABLE (usuario)
+        "nombre": f"{curso.usuario.first_name} {curso.usuario.last_name}".strip(),
+        "tipodoc": getattr(curso.usuario.tipo_documento, "nombre", ""),
+        "numerodoc": getattr(curso.usuario, "documento", ""),
+        "correo": curso.usuario.email,
+
+        # EMPRESA / CARTA
+        "empresa": curso.caracterizacion,   
+        "carta_empresa": curso.carta,
+
+        # ARCHIVOS / DOCUMENTOS
+        "fecha1": curso.pdf_documentos,     
+        "link": curso.link,
+        "tipo_horario": curso.tipo_oferta,  
+    })
+
+    return render(request, "formularios/formulario-formato.html", {
+        "form": form,
+        "usuario": curso.usuario,
+        "modo_detalle": True,
+    })
+
 #Reportes
 def reportes(request):
     cursos = Curso.objects.annotate(
@@ -323,7 +360,7 @@ def generar_curso(request, tipo):
     else:
         form = CursoForm(usuario=usuario)
 
-    return render(request, "formularios/formulario-formato.html", {"form": form, "tipo": tipo, })
+    return render(request, "formularios/formulario-formato.html", {"form": form, "tipo": tipo, "modo_detalle": False})
 
 def tipo_oferta(request):
     return render(request, "tipo_oferta.html")

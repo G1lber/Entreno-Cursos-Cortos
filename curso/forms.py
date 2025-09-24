@@ -216,7 +216,7 @@ class CursoForm(forms.Form):
         choices=[],
         required=False,
         label="Duración (Horas)",
-        widget=forms.Select(attrs={"class": "form-control"})
+        widget=forms.Select(attrs={"class": "form-control"} )
     )
 
     class Meta:

@@ -198,6 +198,12 @@ def reject_request(request, pk):
     solicitud.save()
     return redirect("coordinador")
 
+def academica(request):
+    cursos = Curso.objects.annotate(
+        inscripciones_count=Count("aprendices")
+    ).order_by('-fecha_inicio')
+    return render(request, 'academica_dashboard.html', {'cursos': cursos})
+
 # Ver detalles 
 def curso_detalle(request, pk):
     curso = get_object_or_404(Curso, pk=pk)
@@ -537,6 +543,12 @@ def registrar_aspirante(request, curso_id):
 
                 # Reemplazamos el consolidado con el archivo temporal
                 shutil.move(tmp_file.name, pdf_padre_path)
+
+                # Evitar duplicado en el mismo curso
+                if Aspirante.objects.filter(curso=curso, documento=aspirante.documento).exists():
+                    messages.error(request, f"El aprendiz con documento {aspirante.documento} ya está registrado en este curso.")
+                    return redirect("registrar_aspirante", curso_id=curso.id)
+
 
             aspirante.save()
 

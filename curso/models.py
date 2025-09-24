@@ -144,12 +144,16 @@ class Aspirante(models.Model):
     curso = models.ForeignKey(
         Curso, on_delete=models.CASCADE, related_name="aprendices"
     )
-    documento = models.CharField("Documento", max_length=191, unique=True)  # Ajustado
+    documento = models.CharField("Documento", max_length=191)  # Ajustado
     archivo_documento = models.FileField("Archivo Documento", upload_to="documentos/", blank=True, null=True)
 
     class Meta:
         verbose_name = "Aspirante"
         verbose_name_plural = "Aspirantes"
+        constraints = [
+            models.UniqueConstraint(fields=["curso", "documento"], name="unique_aprendiz_curso")
+        ]
+
 
     def __str__(self):
         return f"{self.nombre} ({self.documento})"

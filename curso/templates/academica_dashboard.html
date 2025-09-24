@@ -1,0 +1,128 @@
+{% extends "base_nav.html" %}
+
+{% load static %}
+
+{%block content%}
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Dashboard</title>
+  <link rel="stylesheet" href="{% static 'css/academica.css' %}">
+</head>
+<body>
+
+  <div class="container">
+
+    <!-- Botón volver -->
+    <a href="{% url 'dashboard' %}" class="btn-back">← Volver</a>
+
+
+    <!-- Estadísticas -->
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div>
+          <p class="stat-title">Pendientes</p>
+          <p class="stat-value">{{ pending_courses|length }}</p>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div>
+          <p class="stat-title">Aprobados</p>
+          <p class="stat-value">{{ approved_courses|length }}</p>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div>
+          <p class="stat-title">Rechazados</p>
+          <p class="stat-value">{{ rejected_courses|length }}</p>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div>
+          <p class="stat-title">Total</p>
+          <p class="stat-value">{{ courses|length }}</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Pendientes -->
+    <div class="card">
+      <div class="card-header">
+        <h3>Solicitudes Pendientes de Aprobación</h3>
+        <p>Revisa y aprueba las solicitudes de creación de cursos</p>
+      </div>
+      <div class="card-content">
+        {% if pending_courses %}
+          {% for course in pending_courses %}
+            <div class="course-item">
+              <div class="course-header">
+                <div>
+                  <h4>{{ course.program }}</h4>
+                  <span class="badge badge-pending">Pendiente</span>
+                </div>
+                <div>
+                  <form method="post" action="{% url 'approve_request' course.id %}" style="display:inline;"> 
+                    {% csrf_token %}
+                    <button class="button button-approve">Aprobar</button>
+                  </form>
+                  <form method="post" action="{% url 'reject_request' course.id %}" style="display:inline;">
+                    {% csrf_token %}
+                    <button class="button button-reject">Rechazar</button>
+                  </form>
+                </div>
+              </div>
+              <div class="course-details">
+                <div><strong>Instructor:</strong> {{ course.curso.usuario.get_full_name }}</div>
+                <div><strong>Duración:</strong> {{ course.curso.programa.duracion }}</div>
+                <div><strong>Inicio:</strong> {{ course.curso.fecha_inicio|date:"d/m/Y" }}</div>
+                <div><strong>Fin:</strong> {{ course.curso.fecha_fin|date:"d/m/Y" }}</div>
+              </div>
+              <div >
+                <form class="detalles_btn" method="get" action="{% url 'curso_detalle' course.curso.id %}">
+                  <button class="button button-approve">Ver Detalles</button>
+                </form>
+              </div>
+            </div>
+          {% endfor %}
+        {% else %}
+          <p class="text-center">No hay solicitudes pendientes</p>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Historial -->
+    <div class="card">
+      <div class="card-header">
+        <h3>Historial de Solicitudes</h3>
+        <p>Todas las solicitudes procesadas</p>
+      </div>
+      <div class="card-content">
+        {% if courses %}
+          {% for course in courses %}
+            <div class="course-item course-header">
+              <div>
+                <h4>{{ course.program }}</h4>
+                <p class="text-sm">Instructor: {{ course.curso.usuario.get_full_name }} </p>
+              </div>
+              <div>
+                {% if course.status == "approved" %}
+                  <span class="badge badge-approved">Aprobado</span>
+                  {% if course.registrationLink %}
+                    <a href="{{ course.registrationLink }}" class="button button-outline">Copiar Link</a>
+                  {% endif %}
+                {% elif course.status == "rejected" %}
+                  <span class="badge badge-rejected">Rechazado</span>
+                {% else %}
+                  <span class="badge badge-pending">Pendiente</span>
+                {% endif %}
+              </div>
+            </div>
+          {% endfor %}
+        {% else %}
+          <p class="text-center">No hay solicitudes registradas</p>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</body>
+{%endblock%}

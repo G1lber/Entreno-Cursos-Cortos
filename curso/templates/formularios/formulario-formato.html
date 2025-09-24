@@ -10,7 +10,7 @@
   </head> 
   <body> 
     <h1>Formulario Curso</h1>
-    <form method="post" enctype="multipart/form-data">
+    <form method="post" enctype="multipart/form-data" {% if modo_detalle %} onsubmit="return false;" {% endif %}>
       {% csrf_token %}
         {# mostrar errores generales y por campo #}
       {% if form.non_field_errors %}
@@ -41,7 +41,7 @@
       {% endif %}
       
       <!-- FILTROS -->
-      <div class="form-section">
+      <div class="form-section" {% if modo_detalle  %} style="display: none;"  {% endif %}>
         <h2>Filtros</h2>
         <div class="form-row">
           <div class="form-group">
@@ -204,9 +204,13 @@
       </div>
       <!-- BOTONES -->
       <div class="form-actions">
-        <button type="submit" class="button-primary">Crear Curso</button>
-        <button type="reset" class="button-outline">Cancelar</button>
-      </div>
+          {% if modo_detalle %}
+            <a href="{% url 'coordinador' %}" class="button-outline">Volver</a>
+          {% else %}
+            <button type="submit" class="button-primary">Crear Curso</button>
+            <button type="reset" class="button-outline">Cancelar</button>
+          {% endif %}
+        </div>
     </form>
 
     <div id="calendar"></div>
@@ -221,20 +225,27 @@
     <script src="{% static 'js/fechas.js' %}"></script>
     <script>
     document.addEventListener("DOMContentLoaded", function () {
-    const empresaInput = document.getElementById("id_empresa");
-    const cartaWrapper = document.getElementById("carta-empresa-wrapper");
+      // --- ya existente (empresa/carta) ---
+      const empresaInput = document.getElementById("id_empresa");
+      const cartaWrapper = document.getElementById("carta-empresa-wrapper");
 
-    if (empresaInput && cartaWrapper) {
-      // inicializar estado
-      cartaWrapper.style.display = empresaInput.value.trim() !== "" ? "block" : "none";
+      if (empresaInput && cartaWrapper) {
+        // inicializar estado
+        cartaWrapper.style.display = empresaInput.value.trim() !== "" ? "block" : "none";
 
-      empresaInput.addEventListener("input", function () {
-        cartaWrapper.style.display = this.value.trim() !== "" ? "block" : "none";
+        empresaInput.addEventListener("input", function () {
+          cartaWrapper.style.display = this.value.trim() !== "" ? "block" : "none";
+        });
+      }
+
+      // --- nuevo: deshabilitar todo en modo detalle ---
+      {% if modo_detalle %}
+      document.querySelectorAll("input, select, textarea, button[type=submit], button[type=reset]").forEach(el => {
+        el.setAttribute("disabled", "disabled");
       });
-    }
-  });
-  </script>
-
+      {% endif %}
+    });
+    </script>
   </body> 
 </html>
 

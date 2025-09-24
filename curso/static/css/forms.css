@@ -141,6 +141,25 @@
       opacity: 1;
     }
 
+    /* Botón volver */
+    .btn-back {
+      display: inline-block;
+      padding: 8px 14px;
+      background: transparent;
+      color: #0d0f0c;             /* azul */
+      border: 2px solid #246902;  /* borde azul */
+      border-radius: 6px;
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 500;
+      transition: all 0.2s ease;
+    }
+
+    .btn-back:hover {
+      background: #246902;
+      color: white;
+    }
+
     /* CHECKBOXES EN LÍNEA (DÍAS) - Estilo para Django forms */
     .checkbox-group {
       display: flex;
@@ -214,6 +233,7 @@
       padding: 0.6rem 1.2rem;
       border-radius: var(--border-radius);
       cursor: pointer;
+      text-decoration: none;
       transition: var(--transition);
       font-weight: 500;
     }

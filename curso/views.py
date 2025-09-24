@@ -31,8 +31,6 @@ from PyPDF2 import PdfMerger
 import tempfile
 import shutil
 
-
-
 def dashboard(request):
     return render(request, 'dashboard.html')
 
@@ -51,16 +49,24 @@ def buscar_curso(request):
             Q(usuario__documento__icontains=q)
         )
 
-        # mapear estado numérico a texto
-        estado_map = {0: "pending", 1: "approved", 2: "rejected"}
+        # Obtener el estado REAL de cada curso desde su solicitud
         for c in courses:
-            c.status = estado_map.get(c.estado, "pending")
-            c.registrationLink = c.link  # 👈 usar el campo `link` del modelo
+            try:
+                # Buscar la solicitud asociada a este curso
+                solicitud = Solicitud.objects.get(curso=c)
+                estado_map = {0: "pending", 1: "approved", 2: "rejected"}
+                c.status = estado_map.get(solicitud.estado, "pending")
+            except Solicitud.DoesNotExist:
+                # Si no existe solicitud, está pendiente
+                c.status = "pending"
+            
+            c.registrationLink = c.link
 
     return render(request, "buscar_curso.html", {
         "courses": courses,
         "q": q
     })
+
 #Eliminar Curso
 def eliminar_curso(request, curso_id):
     if request.method == "POST":
@@ -136,7 +142,7 @@ def generate_reports(request, curso_id):
     course = Curso.objects.get(id=curso_id)
     aspirantes = Aspirante.objects.filter(curso=course)
 
-    # ---------- REPORTE 1 (pandas - todos los datos) ----------
+    # ---------- REPORTE 1 ----------
     aspirantes_data1 = []
     for asp in aspirantes:
         partes = asp.nombre.strip().split(" ", 1)
@@ -155,48 +161,55 @@ def generate_reports(request, curso_id):
         ])
 
     df1 = pd.DataFrame(aspirantes_data1, columns=[
-        "Tipo Documento",
-        "Documento",
-        "Nombres",
-        "Apellidos",
-        "Correo",
-        "Teléfono",
-        "Población",
-        "Programa"
+        "Tipo Documento", "Documento", "Nombres", "Apellidos",
+        "Correo", "Teléfono", "Población", "Programa"
     ])
 
-    buffer1 = BytesIO()
-    df1.to_excel(buffer1, index=False, engine="openpyxl")
-    buffer1.seek(0)
-
-    # ---------- REPORTE 2 (llenando plantilla .xlsm, sin macros) ----------
+    # ---------- REPORTE 2 ----------
     plantilla_path = os.path.join(settings.BASE_DIR, "curso", "templates", "docs", "Masivo 2024 MOISO.xlsm")
     wb = load_workbook(plantilla_path)
-    ws = wb.active  # o selecciona por nombre: wb["Hoja1"]
-
-    fila = 3  # empezar desde la fila 3
+    ws = wb.active
+    fila = 3
     for asp in aspirantes:
         ws[f"B{fila}"] = asp.tipo_documento.nombre if asp.tipo_documento else ""
         ws[f"C{fila}"] = asp.documento
         ws[f"E{fila}"] = asp.poblacion.nombre if asp.poblacion else ""
         fila += 1
 
-    buffer2 = BytesIO()
-    wb.save(buffer2)
-    buffer2.seek(0)
+    # 📂 Carpeta del curso (donde están los PDFs también)
+    carpeta_curso = os.path.join(settings.BASE_DIR, "curso", "templates", "docs", str(curso_id))
+    os.makedirs(carpeta_curso, exist_ok=True)
 
-    # ---------- EMPAQUETAR ZIP ----------
-    zip_buffer = BytesIO()
-    with zipfile.ZipFile(zip_buffer, "w") as zip_file:
-        zip_file.writestr(f"Reporte_Completo_curso_{curso_id}.xlsx", buffer1.getvalue())
-        zip_file.writestr(f"Reporte_Poblacion_curso_{curso_id}.xlsx", buffer2.getvalue())
+    # Guardar Reporte 1
+    path_reporte1 = os.path.join(carpeta_curso, f"Reporte_Completo_curso_{curso_id}.xlsx")
+    df1.to_excel(path_reporte1, index=False, engine="openpyxl")
 
-    zip_buffer.seek(0)
+    # Guardar Reporte 2
+    path_reporte2 = os.path.join(carpeta_curso, f"Reporte_Poblacion_curso_{curso_id}.xlsx")
+    wb.save(path_reporte2)
 
-    response = HttpResponse(zip_buffer, content_type="application/zip")
-    response["Content-Disposition"] = f'attachment; filename="reportes_curso_{curso_id}.zip"'
+    # Crear ZIP con reportes y PDFs
+    zip_path = os.path.join(carpeta_curso, f"Reportes_curso_{curso_id}.zip")
+    with zipfile.ZipFile(zip_path, "w") as zipf:
+        # Añadir reportes Excel (siempre se generan, aunque no haya aspirantes)
+        zipf.write(path_reporte1, os.path.basename(path_reporte1))
+        zipf.write(path_reporte2, os.path.basename(path_reporte2))
 
-    return response
+        # Añadir consolidado si existe
+        consolidado = os.path.join(carpeta_curso, "aspirantes_consolidado.pdf")
+        if os.path.exists(consolidado):
+            zipf.write(consolidado, "aspirantes_consolidado.pdf")
+
+        # Añadir PDFs individuales de aspirantes
+        carpeta_aspirantes = os.path.join(carpeta_curso, "aspirantes")
+        if os.path.exists(carpeta_aspirantes):
+            for archivo in os.listdir(carpeta_aspirantes):
+                if archivo.lower().endswith(".pdf"):
+                    ruta_pdf = os.path.join(carpeta_aspirantes, archivo)
+                    zipf.write(ruta_pdf, os.path.join("aspirantes", archivo))
+
+    # Descargar el ZIP
+    return FileResponse(open(zip_path, "rb"), as_attachment=True, filename=f"Reportes_curso_{curso_id}.zip")
 
 # Generar curso y documento
 def generar_curso(request, tipo):
@@ -369,6 +382,7 @@ def curso_generado(request):
         "curso": curso,
         "url_aspirantes": url_aspirantes,
     })
+
 # Registrar aspirante a un curso
 def registrar_aspirante(request, curso_id):
     curso = get_object_or_404(Curso, id=curso_id)
@@ -460,7 +474,7 @@ def ocr_aspirante(request):
                 pages = convert_from_path(
                     temp_path,
                     dpi=300,
-                    poppler_path=r"C:\Users\SENASoft2025\Downloads\Release-25.07.0-0\poppler-25.07.0\Library\bin"
+                    poppler_path=r"C:\Users\SENASoft\Downloads\Release-25.07.0-0\poppler-25.07.0\Library\bin"
                 )
                 for page in pages:
                     texto += pytesseract.image_to_string(page, lang="spa")

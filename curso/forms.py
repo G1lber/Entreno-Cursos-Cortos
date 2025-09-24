@@ -1,5 +1,5 @@
 from django import forms
-from .models import Usuario, Programa, Departamento, Municipio, Aspirante
+from .models import Usuario, Programa, Departamento, Municipio, Aspirante, Area, Curso 
 from django.core.validators import FileExtensionValidator
 
 class InicioSesionForm(forms.Form):
@@ -17,7 +17,6 @@ class InicioSesionForm(forms.Form):
             "placeholder": "Ingrese su contraseña"
         })
     )
-
 
 class UsuarioCreateForm(forms.ModelForm):
     password = forms.CharField(
@@ -115,7 +114,6 @@ class UsuarioCreateForm(forms.ModelForm):
             usuario.save()
         return usuario
 
-
 class UsuarioEditForm(forms.ModelForm):
     password = forms.CharField(
         widget=forms.PasswordInput(attrs={
@@ -204,13 +202,6 @@ class UsuarioEditForm(forms.ModelForm):
         if commit:
             usuario.save()
         return usuario
-
-from django import forms
-from .models import Programa, Departamento, Municipio
-
-
-from django import forms
-from .models import Programa, Departamento, Municipio, Area, Curso 
 
 class CursoForm(forms.Form):
     
@@ -408,7 +399,6 @@ class CursoForm(forms.Form):
             self.fields["correo"].initial = usuario.email
             if usuario.firma_digital:
                 self.fields["firma"].initial = usuario.firma_digital
-from django import forms
 
 class AspiranteForm(forms.Form):
     nombre = forms.CharField(

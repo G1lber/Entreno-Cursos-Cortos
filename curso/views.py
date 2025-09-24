@@ -30,6 +30,8 @@ from django.db.models import Count
 from PyPDF2 import PdfMerger   
 import tempfile
 import shutil
+from docxtpl import DocxTemplate, InlineImage
+from docx.shared import Mm
 
 def dashboard(request):
     return render(request, 'dashboard.html')
@@ -123,7 +125,72 @@ def approve_request(request, pk):
     solicitud = get_object_or_404(Solicitud, pk=pk)
     solicitud.estado = 1  # aprobado
     solicitud.save()
-    return redirect("coordinador")  
+    
+    # ✅ GENERAR EXCEL AUTOMÁTICAMENTE AL APROBAR
+    try:
+        curso = solicitud.curso
+        aspirantes = Aspirante.objects.filter(curso=curso)
+
+        # ---------- REPORTE 1 ----------
+        aspirantes_data1 = []
+        for asp in aspirantes:
+            partes = asp.nombre.strip().split(" ", 1)
+            nombres = partes[0] if len(partes) > 0 else ""
+            apellidos = partes[1] if len(partes) > 1 else ""
+
+            aspirantes_data1.append([
+                asp.tipo_documento.nombre if asp.tipo_documento else "",
+                asp.documento,
+                nombres,
+                apellidos,
+                asp.correo,
+                asp.telefono if asp.telefono else "",
+                asp.poblacion.nombre if asp.poblacion else "",
+                curso.programa.nombre if curso.programa else "",
+            ])
+
+        df1 = pd.DataFrame(aspirantes_data1, columns=[
+            "Tipo Documento", "Documento", "Nombres", "Apellidos",
+            "Correo", "Teléfono", "Población", "Programa"
+        ])
+
+        # ---------- REPORTE 2 ----------
+        plantilla_path = os.path.join(settings.BASE_DIR, "curso", "templates", "docs", "Masivo 2024 MOISO.xlsm")
+        wb = load_workbook(plantilla_path)
+        ws = wb.active
+        fila = 3
+        for asp in aspirantes:
+            ws[f"B{fila}"] = asp.tipo_documento.nombre if asp.tipo_documento else ""
+            ws[f"C{fila}"] = asp.documento
+            ws[f"E{fila}"] = asp.poblacion.nombre if asp.poblacion else ""
+            fila += 1
+
+        # 📂 Carpeta del curso
+        carpeta_curso = os.path.join(settings.BASE_DIR, "curso", "templates", "docs", str(curso.id))
+        os.makedirs(carpeta_curso, exist_ok=True)
+
+        # Guardar Reporte 1
+        path_reporte1 = os.path.join(carpeta_curso, f"Reporte_Completo_curso_{curso.id}.xlsx")
+        df1.to_excel(path_reporte1, index=False, engine="openpyxl")
+
+        # Guardar Reporte 2
+        path_reporte2 = os.path.join(carpeta_curso, f"Reporte_Poblacion_curso_{curso.id}.xlsx")
+        wb.save(path_reporte2)
+        
+        # ✅ VERIFICAR SI EXISTE EL DOCUMENTO MASIVO (plantilla-curso)
+        documento_masivo_path = os.path.join(carpeta_curso, f"curso_{curso.id}.docx")
+        if not os.path.exists(documento_masivo_path) and curso.caracterizacion:
+            # Si no existe pero hay una ruta en la BD, intentar copiarlo
+            ruta_existente = os.path.join(settings.BASE_DIR, "curso", "templates", curso.caracterizacion)
+            if os.path.exists(ruta_existente):
+                shutil.copy2(ruta_existente, documento_masivo_path)
+        
+        messages.success(request, f"Solicitud aprobada y reportes generados para el curso {curso.programa.nombre}")
+        
+    except Exception as e:
+        messages.error(request, f"Solicitud aprobada, pero error generando reportes: {str(e)}")
+    
+    return redirect("coordinador")
 
 def reject_request(request, pk):
     solicitud = get_object_or_404(Solicitud, pk=pk)
@@ -588,6 +655,49 @@ def descargar_curso(request, curso_id):
 
     except Curso.DoesNotExist:
         raise Http404("Curso no existe")
+
+def descargar_carpeta_curso(request, curso_id):
+    try:
+        curso = Curso.objects.get(id=curso_id)
+        carpeta_curso = os.path.join(settings.BASE_DIR, "curso", "templates", "docs", str(curso_id))
+        
+        # Verificar si la carpeta existe
+        if not os.path.exists(carpeta_curso):
+            messages.error(request, "La carpeta del curso no existe aún.")
+            return redirect("buscar_curso")
+        
+        # Crear ZIP con todo el contenido de la carpeta
+        zip_path = os.path.join(carpeta_curso, f"carpeta_completa_curso_{curso_id}.zip")
+        with zipfile.ZipFile(zip_path, "w") as zipf:
+            for root, dirs, files in os.walk(carpeta_curso):
+                for file in files:
+                    # Excluir el ZIP que estamos creando para evitar recursividad
+                    if not file.endswith(".zip"):
+                        file_path = os.path.join(root, file)
+                        # Ruta relativa dentro del ZIP
+                        arcname = os.path.relpath(file_path, carpeta_curso)
+                        zipf.write(file_path, arcname)
+            
+            # ✅ INCLUIR EL DOCUMENTO MASIVO (plantilla-curso) si existe
+            documento_masivo_path = os.path.join(carpeta_curso, f"curso_{curso_id}.docx")
+            if os.path.exists(documento_masivo_path):
+                zipf.write(documento_masivo_path, f"curso_{curso_id}.docx")
+            
+            # ✅ INCLUIR LA CARTA DE EMPRESA si existe
+            if curso.carta:
+                carta_path = os.path.join(settings.BASE_DIR, "curso", "templates", curso.carta)
+                if os.path.exists(carta_path):
+                    zipf.write(carta_path, os.path.basename(carta_path))
+        
+        # Descargar el ZIP
+        return FileResponse(open(zip_path, "rb"), as_attachment=True, filename=f"carpeta_curso_{curso_id}.zip")
+        
+    except Curso.DoesNotExist:
+        messages.error(request, "El curso no existe.")
+        return redirect("buscar_curso")
+    except Exception as e:
+        messages.error(request, f"Error al descargar la carpeta: {str(e)}")
+        return redirect("buscar_curso")
 
 def inicioSesion(request):
     if request.method == 'POST':

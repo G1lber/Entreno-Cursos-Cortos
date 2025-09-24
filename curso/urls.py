@@ -79,6 +79,8 @@ urlpatterns = [
     path("curso-generado/", views.curso_generado, name="curso_generado"),
     # Descargar archivo Word generado
     path("curso/<int:curso_id>/descargar/", views.descargar_curso, name="descargar_curso"),
+    # Descargar Carpeta Documentos
+    path('curso/<int:curso_id>/descargar-carpeta/', views.descargar_carpeta_curso, name='descargar_carpeta_curso'),
     # Eliminar curso
     path("eliminar/<int:curso_id>/", views.eliminar_curso, name="eliminar_curso"),
     # Procesar OCR para un aspirante

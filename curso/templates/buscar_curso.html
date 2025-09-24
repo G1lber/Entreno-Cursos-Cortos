@@ -80,8 +80,9 @@
                 {% csrf_token %}
                 <button type="submit" class="btn-eliminar">Eliminar</button>
               </form>
-            </td>
 
+                <a href="{% url 'descargar_carpeta_curso' course.id %}" class="btn-descargar">Descargar Carpeta</a>
+            </td>
 
           </tr>
           {% endfor %}
